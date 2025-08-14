@@ -1,14 +1,14 @@
 {
-  "name": "beautybot-adk",
+  "name": "beautybot-gemini",
   "version": "1.0.0",
+  "description": "Production WhatsApp chatbot for Beauty Blossoms powered by Gemini",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": ["whatsapp", "firebase", "gemini", "chatbot", "beauty"],
+  "author": "Daniel Pinto",
+  "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "axios": "^1.11.0",
