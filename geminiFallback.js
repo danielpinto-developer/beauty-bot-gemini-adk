@@ -1,24 +1,10 @@
+// geminiFallback.js
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 console.log("📦 Loading Gemini module...");
-
-if (!process.env.GEMINI_API_KEY) {
-  console.error("❌ GEMINI_API_KEY is missing from .env");
-  throw new Error("Missing GEMINI_API_KEY");
-}
-
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({
-  model: "models/gemini-pro", // 🔥 REQUIRED full path
-  generationConfig: {
-    temperature: 0.7,
-    topP: 1,
-    topK: 1,
-    maxOutputTokens: 400,
-  },
-});
-
-console.log("✅ Gemini model initialized: gemini-pro");
+const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-pro" });
+console.log("✅ Gemini model initialized: models/gemini-1.5-pro");
 
 const systemPrompt = `
 Eres BeautyBot, la asistente profesional y cálida de Beauty Blossoms Studio, un salón de belleza en Zapopan, Jalisco.
@@ -45,9 +31,9 @@ Responde en este formato JSON **exacto**:
 `;
 
 async function getGeminiReply(userText) {
-  console.log("🧠 getGeminiReply called with input:", userText);
-
   try {
+    console.log("🧠 getGeminiReply called with input:", userText);
+
     const chat = await model.startChat({
       history: [
         {
@@ -58,25 +44,20 @@ async function getGeminiReply(userText) {
     });
 
     console.log("💬 Chat session started successfully");
-    console.log("📨 Sending user message to Gemini:", userText);
 
+    console.log("📨 Sending user message to Gemini:", userText);
     const result = await chat.sendMessage(userText);
 
-    console.log("✅ Gemini responded");
-    const responseText = result.response.text().trim();
-    console.log("📄 Raw Gemini response:\n", responseText);
+    const text = result.response.text().trim();
+    console.log("📨 Gemini raw response:", text);
 
-    const jsonStart = responseText.indexOf("{");
-    const jsonText = responseText.slice(jsonStart);
-
-    console.log("🧾 Extracted JSON snippet:\n", jsonText);
-
+    const jsonStart = text.indexOf("{");
+    const jsonText = text.slice(jsonStart);
     const parsed = JSON.parse(jsonText);
 
-    console.log("✅ Parsed JSON response:", parsed);
     return parsed;
   } catch (err) {
-    console.error("❌ Gemini fallback error:", err.message || err);
+    console.error("❌ Gemini fallback error:", err);
     return {
       intent: "fallback",
       slots: {},
