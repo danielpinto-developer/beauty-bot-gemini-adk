@@ -1,9 +1,6 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// Init Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-// Correct model ID for v1
 const model = genAI.getGenerativeModel({ model: "models/gemini-pro" });
 
 const systemPrompt = `
@@ -36,7 +33,7 @@ async function getGeminiReply(userText) {
       history: [
         {
           role: "user",
-          parts: [systemPrompt],
+          parts: [{ text: systemPrompt }],
         },
       ],
     });
