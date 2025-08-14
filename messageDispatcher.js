@@ -1,7 +1,7 @@
-// messageDispatcher.js
 const { sendMessage } = require("./whatsapp");
 const { getGeminiReply } = require("./geminiFallback");
 const { db, admin } = require("./firebase");
+const { collection, addDoc, setDoc } = require("firebase-admin/firestore");
 
 const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
 
@@ -16,6 +16,36 @@ const precios = {
 
 const notifyMoni = async (phone, reason) => {
   console.log(`📣 Notify Moni: ${phone} needs manual follow-up (${reason})`);
+};
+
+const formatDateString = (inputDate, inputTime) => {
+  try {
+    const now = new Date();
+    const lowercaseInput = inputDate?.toLowerCase();
+
+    const keywordDates = {
+      hoy: now,
+      mañana: new Date(now.getTime() + 86400000),
+      pasado: new Date(now.getTime() + 2 * 86400000),
+    };
+
+    const targetDate = keywordDates[lowercaseInput]
+      ? keywordDates[lowercaseInput]
+      : new Date(inputDate); // fallback for '10 de agosto'
+
+    const formatted = targetDate.toLocaleDateString("es-MX", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    });
+
+    const capitalized = formatted.replace(/\b\w/g, (c) => c.toUpperCase());
+
+    return `${capitalized} a las ${inputTime}`;
+  } catch (err) {
+    console.error("⚠️ Error formatting date:", inputDate, inputTime, err);
+    return `${inputDate} a las ${inputTime}`;
+  }
 };
 
 async function logMessage({
@@ -39,8 +69,7 @@ async function logMessage({
   if (action) data.action = action;
   if (slots) data.slots = slots;
 
-  // FIXED: no more 'collection is not a function'
-  await db.collection("chats").doc(phone).collection("messages").add(data);
+  await addDoc(collection(db, "chats", phone, "messages"), data);
 }
 
 async function messageDispatcher({ phone, text }) {
@@ -49,8 +78,8 @@ async function messageDispatcher({ phone, text }) {
   const { intent, slots, response } = await getGeminiReply(text);
   const { servicio, fecha, hora } = slots || {};
 
-  const chatRef = db.collection("chats").doc(phone); // also works for admin
-  await chatRef.set({ last_updated: serverTimestamp() }, { merge: true });
+  const chatRef = db.doc(`chats/${phone}`);
+  await setDoc(chatRef, { last_updated: serverTimestamp() }, { merge: true });
 
   await logMessage({
     phone,
@@ -67,7 +96,8 @@ async function messageDispatcher({ phone, text }) {
     const price = servicio ? precios[servicio.toLowerCase()] : null;
 
     if (fecha && hora && servicio) {
-      replyText = `Perfecto 💅 Cita para *${servicio}* el *${fecha}* a las *${hora}*${
+      const formattedDateTime = formatDateString(fecha, hora);
+      replyText = `Perfecto 💅 Cita para *${servicio}* el *${formattedDateTime}*${
         price ? ` (costo: ${price})` : ""
       }. En unos momentos confirmamos la disponibilidad de tu cita ✨`;
     } else {
