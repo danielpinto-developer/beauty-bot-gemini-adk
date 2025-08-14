@@ -1,7 +1,6 @@
 const { sendMessage } = require("./whatsapp");
 const { getGeminiReply } = require("./geminiFallback");
 const { db, admin } = require("./firebase");
-const { collection, addDoc, setDoc, doc } = require("firebase-admin/firestore");
 
 const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
 
@@ -39,7 +38,34 @@ async function logMessage({
   if (action) data.action = action;
   if (slots) data.slots = slots;
 
-  await addDoc(collection(db, "chats", phone, "messages"), data);
+  await admin
+    .firestore()
+    .collection("chats")
+    .doc(phone)
+    .collection("messages")
+    .add(data);
+}
+
+function formatFecha(fechaStr) {
+  const now = new Date();
+  let targetDate;
+
+  if (fechaStr?.toLowerCase() === "mañana") {
+    targetDate = new Date(now);
+    targetDate.setDate(now.getDate() + 1);
+  } else if (fechaStr?.toLowerCase() === "hoy") {
+    targetDate = new Date(now);
+  } else {
+    return fechaStr;
+  }
+
+  return new Intl.DateTimeFormat("es-MX", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  })
+    .format(targetDate)
+    .replace(/\b\w/, (l) => l.toUpperCase());
 }
 
 async function messageDispatcher({ phone, text }) {
@@ -48,8 +74,10 @@ async function messageDispatcher({ phone, text }) {
   const { intent, slots, response } = await getGeminiReply(text);
   const { servicio, fecha, hora } = slots || {};
 
-  const chatRef = doc(db, "chats", phone);
-  await setDoc(chatRef, { last_updated: serverTimestamp() }, { merge: true });
+  await admin
+    .firestore()
+    .doc(`chats/${phone}`)
+    .set({ last_updated: serverTimestamp() }, { merge: true });
 
   await logMessage({
     phone,
@@ -64,9 +92,10 @@ async function messageDispatcher({ phone, text }) {
 
   if (intent === "book_appointment") {
     const price = servicio ? precios[servicio.toLowerCase()] : null;
+    const fechaFormatted = formatFecha(fecha);
 
     if (fecha && hora && servicio) {
-      replyText = `Perfecto 💅 Cita para *${servicio}* el *${fecha}* a las *${hora}*${
+      replyText = `Perfecto 💅 Cita para *${servicio}* el *${fechaFormatted}* a las *${hora}*${
         price ? ` (costo: ${price})` : ""
       }. En unos momentos confirmamos la disponibilidad de tu cita ✨`;
     } else {
@@ -79,7 +108,9 @@ async function messageDispatcher({ phone, text }) {
 
     await notifyMoni(
       phone,
-      `Cita solicitada: ${fecha || "?"} ${hora || "?"} (${servicio || "?"})`
+      `Cita solicitada: ${fechaFormatted || "?"} ${hora || "?"} (${
+        servicio || "?"
+      })`
     );
   }
 
@@ -91,8 +122,7 @@ async function messageDispatcher({ phone, text }) {
   }
 
   if (intent === "faq_location") {
-    replyText =
-      "📍 *Ubicación:* Beauty Blossoms en Google Maps\nhttps://maps.app.goo.gl/CtavKUYUV3zyvaLU6";
+    replyText = `📍 Ubicación: [Beauty Blossoms en Google Maps](https://maps.app.goo.gl/CtavKUYUV3zyvaLU6)`;
   }
 
   if (intent === "gratitude") {
