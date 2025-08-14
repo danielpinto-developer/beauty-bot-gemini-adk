@@ -122,7 +122,7 @@ async function messageDispatcher({ phone, text }) {
   }
 
   if (intent === "faq_location") {
-    replyText = `📍 Ubicación: [Beauty Blossoms en Google Maps](https://maps.app.goo.gl/CtavKUYUV3zyvaLU6)`;
+    replyText = `📍 Ubicación: Beauty Blossoms \n(https://maps.app.goo.gl/CtavKUYUV3zyvaLU6)`;
   }
 
   if (intent === "gratitude") {
