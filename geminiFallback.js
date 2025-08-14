@@ -44,17 +44,20 @@ async function getGeminiReply(userText) {
     });
 
     console.log("💬 Chat session started successfully");
-
     console.log("📨 Sending user message to Gemini:", userText);
+
     const result = await chat.sendMessage(userText);
+    const raw = result.response.text().trim();
+    console.log("📨 Gemini raw response:", raw);
 
-    const text = result.response.text().trim();
-    console.log("📨 Gemini raw response:", text);
+    // Strip triple backticks if present
+    const clean = raw
+      .replace(/^```json/i, "")
+      .replace(/^```/, "")
+      .replace(/```$/, "")
+      .trim();
 
-    const jsonStart = text.indexOf("{");
-    const jsonText = text.slice(jsonStart);
-    const parsed = JSON.parse(jsonText);
-
+    const parsed = JSON.parse(clean);
     return parsed;
   } catch (err) {
     console.error("❌ Gemini fallback error:", err);
