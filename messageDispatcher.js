@@ -1,7 +1,7 @@
+// messageDispatcher.js
 const { sendMessage } = require("./whatsapp");
 const { getGeminiReply } = require("./geminiFallback");
 const { db, admin } = require("./firebase");
-const { collection, addDoc } = require("firebase-admin/firestore");
 
 const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
 
@@ -39,7 +39,8 @@ async function logMessage({
   if (action) data.action = action;
   if (slots) data.slots = slots;
 
-  await addDoc(collection(db, "chats", phone, "messages"), data);
+  // FIXED: no more 'collection is not a function'
+  await db.collection("chats").doc(phone).collection("messages").add(data);
 }
 
 async function messageDispatcher({ phone, text }) {
@@ -48,7 +49,7 @@ async function messageDispatcher({ phone, text }) {
   const { intent, slots, response } = await getGeminiReply(text);
   const { servicio, fecha, hora } = slots || {};
 
-  const chatRef = db.doc(`chats/${phone}`);
+  const chatRef = db.collection("chats").doc(phone); // also works for admin
   await chatRef.set({ last_updated: serverTimestamp() }, { merge: true });
 
   await logMessage({
