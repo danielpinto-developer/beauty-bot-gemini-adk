@@ -8,7 +8,15 @@ if (!process.env.GEMINI_API_KEY) {
 }
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+const model = genAI.getGenerativeModel({
+  model: "models/gemini-pro", // 🔥 REQUIRED full path
+  generationConfig: {
+    temperature: 0.7,
+    topP: 1,
+    topK: 1,
+    maxOutputTokens: 400,
+  },
+});
 
 console.log("✅ Gemini model initialized: gemini-pro");
 
