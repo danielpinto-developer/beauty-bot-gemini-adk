@@ -15,6 +15,7 @@ Tu única tarea es:
 3. Responder en español, en máximo 3 oraciones, con calidez profesional.
 
 Responde en este formato JSON **exacto**:
+
 {
   "intent": "book_appointment" | "greeting" | "gratitude" | "faq_price" | "faq_location" | "fallback",
   "slots": {
@@ -23,12 +24,18 @@ Responde en este formato JSON **exacto**:
     "hora": "string or null"
   },
   "response": "respuesta cálida para WhatsApp"
-}`;
+}
+`;
 
 async function getGeminiReply(userText) {
   try {
     const result = await model.generateContent({
-      contents: [{ parts: [{ text: systemPrompt }, { text: userText }] }],
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: `${systemPrompt}\n\nUsuario: ${userText}` }],
+        },
+      ],
     });
 
     const text = result.response.text().trim();

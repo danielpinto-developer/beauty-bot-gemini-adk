@@ -1,7 +1,7 @@
 const { sendMessage } = require("./whatsapp");
 const { getGeminiReply } = require("./geminiFallback");
 const { db, admin } = require("./firebase");
-const { collection, addDoc, setDoc } = require("firebase-admin/firestore");
+const { collection, addDoc } = require("firebase-admin/firestore");
 
 const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
 
@@ -49,7 +49,7 @@ async function messageDispatcher({ phone, text }) {
   const { servicio, fecha, hora } = slots || {};
 
   const chatRef = db.doc(`chats/${phone}`);
-  await setDoc(chatRef, { last_updated: serverTimestamp() }, { merge: true });
+  await chatRef.set({ last_updated: serverTimestamp() }, { merge: true });
 
   await logMessage({
     phone,
