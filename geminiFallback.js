@@ -1,6 +1,9 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
+// Init Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// Correct model ID for v1
 const model = genAI.getGenerativeModel({ model: "models/gemini-pro" });
 
 const systemPrompt = `
@@ -29,16 +32,16 @@ Responde en este formato JSON **exacto**:
 
 async function getGeminiReply(userText) {
   try {
-    const chat = model.startChat({
-      history: [],
-      generationConfig: {
-        temperature: 0.4,
-      },
+    const chat = await model.startChat({
+      history: [
+        {
+          role: "user",
+          parts: [systemPrompt],
+        },
+      ],
     });
 
-    const result = await chat.sendMessage(
-      `${systemPrompt}\n\nUsuario: ${userText}`
-    );
+    const result = await chat.sendMessage(userText);
     const text = result.response.text().trim();
 
     const jsonStart = text.indexOf("{");
