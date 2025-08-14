@@ -6,7 +6,13 @@
   "scripts": {
     "start": "node index.js"
   },
-  "keywords": ["whatsapp", "firebase", "gemini", "chatbot", "beauty"],
+  "keywords": [
+    "whatsapp",
+    "firebase",
+    "gemini",
+    "chatbot",
+    "beauty"
+  ],
   "author": "Daniel Pinto",
   "license": "MIT",
   "dependencies": {
