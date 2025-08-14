@@ -9,6 +9,18 @@ const { admin, db } = require("./firebase");
 
 app.use(express.json());
 
+app.post("/", async (req, res) => {
+  const { phone, text } = req.body;
+
+  try {
+    await messageDispatcher({ phone, text });
+    res.status(200).send("OK");
+  } catch (err) {
+    console.error("❌ Webhook error:", err);
+    res.status(500).send("Webhook failed");
+  }
+});
+
 app.get("/webhook", (req, res) => {
   const VERIFY_TOKEN = "beauty-bot-token";
   const mode = req.query["hub.mode"];
