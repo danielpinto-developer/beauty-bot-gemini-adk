@@ -1,7 +1,6 @@
 const { sendMessage } = require("./whatsapp");
 const { getGeminiReply } = require("./geminiFallback");
 const { db, admin } = require("./firebase");
-const { collection, addDoc } = require("firebase-admin/firestore");
 
 const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
 
@@ -39,10 +38,14 @@ async function logMessage({
   if (action) data.action = action;
   if (slots) data.slots = slots;
 
-  await addDoc(collection(db, "chats", phone, "messages"), data);
+  await admin
+    .firestore()
+    .collection("chats")
+    .doc(phone)
+    .collection("messages")
+    .add(data);
 }
 
-// Convert "mañana", "hoy", or a natural date into `Viernes, 16 de Agosto`
 function formatFecha(fechaStr) {
   const now = new Date();
   let targetDate;
@@ -53,7 +56,7 @@ function formatFecha(fechaStr) {
   } else if (fechaStr?.toLowerCase() === "hoy") {
     targetDate = new Date(now);
   } else {
-    return fechaStr; // fallback to whatever Gemini sent
+    return fechaStr;
   }
 
   return new Intl.DateTimeFormat("es-MX", {
@@ -62,7 +65,7 @@ function formatFecha(fechaStr) {
     month: "long",
   })
     .format(targetDate)
-    .replace(/\b\w/g, (l) => l.toUpperCase()); // Capitalize first letters
+    .replace(/\b\w/, (l) => l.toUpperCase());
 }
 
 async function messageDispatcher({ phone, text }) {
@@ -71,8 +74,10 @@ async function messageDispatcher({ phone, text }) {
   const { intent, slots, response } = await getGeminiReply(text);
   const { servicio, fecha, hora } = slots || {};
 
-  const chatRef = db.doc(`chats/${phone}`);
-  await chatRef.set({ last_updated: serverTimestamp() }, { merge: true });
+  await admin
+    .firestore()
+    .doc(`chats/${phone}`)
+    .set({ last_updated: serverTimestamp() }, { merge: true });
 
   await logMessage({
     phone,
