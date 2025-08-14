@@ -5,10 +5,7 @@ const port = process.env.PORT || 8080;
 
 const { messageDispatcher } = require("./messageDispatcher");
 const { handleUnsupportedMedia } = require("./mediaHandler");
-
-const firestore = require("firebase-admin/firestore");
-const db = firestore.getFirestore();
-const { doc, getDoc, setDoc } = firestore;
+const { admin, db } = require("./firebase");
 
 app.use(express.json());
 
@@ -54,13 +51,13 @@ app.post("/webhook", async (req, res) => {
     console.log("📞 From:", phone);
     console.log("💬 Text:", messageText);
 
-    const messageMetaRef = doc(db, "chats", phone, "metadata", "lastMessage");
-    const previous = await getDoc(messageMetaRef);
-    if (previous.exists() && previous.data().id === messageId) {
+    const messageMetaRef = db.doc(`chats/${phone}/metadata/lastMessage`);
+    const previous = await messageMetaRef.get();
+    if (previous.exists && previous.data().id === messageId) {
       console.log("🔁 Duplicate message detected. Skipping.");
       return res.status(200).send("Duplicate ignored");
     }
-    await setDoc(messageMetaRef, { id: messageId });
+    await messageMetaRef.set({ id: messageId });
 
     const mediaCheck = handleUnsupportedMedia(messageEntry);
     if (mediaCheck) {
