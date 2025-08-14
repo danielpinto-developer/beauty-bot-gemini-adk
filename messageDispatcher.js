@@ -1,12 +1,9 @@
 const { sendMessage } = require("./whatsapp");
 const { getGeminiReply } = require("./geminiFallback");
-const { db } = require("./firebase");
-const {
-  collection,
-  addDoc,
-  setDoc,
-  serverTimestamp,
-} = require("firebase-admin/firestore");
+const { db, admin } = require("./firebase");
+const { collection, addDoc, setDoc } = require("firebase-admin/firestore");
+
+const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
 
 const precios = {
   "uñas acrílicas": "$350 MXN",

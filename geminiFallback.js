@@ -1,10 +1,8 @@
-// geminiFallback.js
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// Init Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-// System prompt — how Gemini should behave
 const systemPrompt = `
 Eres BeautyBot, la asistente profesional y cálida de Beauty Blossoms Studio, un salón de belleza en Zapopan, Jalisco.
 
@@ -17,29 +15,23 @@ Tu única tarea es:
 3. Responder en español, en máximo 3 oraciones, con calidez profesional.
 
 Responde en este formato JSON **exacto**:
-
 {
-  "intent": "book_appointment" | "greeting" | "gratitude" | "faq_price" | "faq_location" | "fallback" | etc.,
+  "intent": "book_appointment" | "greeting" | "gratitude" | "faq_price" | "faq_location" | "fallback",
   "slots": {
     "servicio": "string or null",
     "fecha": "string or null",
     "hora": "string or null"
   },
   "response": "respuesta cálida para WhatsApp"
-}
-`;
+}`;
 
 async function getGeminiReply(userText) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-    const result = await model.generateContent([
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userText },
-    ]);
+    const result = await model.generateContent({
+      contents: [{ parts: [{ text: systemPrompt }, { text: userText }] }],
+    });
 
     const text = result.response.text().trim();
-
-    // Parse JSON from Gemini reply
     const jsonStart = text.indexOf("{");
     const jsonText = text.slice(jsonStart);
     const parsed = JSON.parse(jsonText);
