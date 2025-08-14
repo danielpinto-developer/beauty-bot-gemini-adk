@@ -4,7 +4,6 @@ const { db } = require("./firebase");
 const {
   collection,
   addDoc,
-  doc,
   setDoc,
   serverTimestamp,
 } = require("firebase-admin/firestore");
@@ -52,11 +51,8 @@ async function messageDispatcher({ phone, text }) {
   const { intent, slots, response } = await getGeminiReply(text);
   const { servicio, fecha, hora } = slots || {};
 
-  await setDoc(
-    doc(db, "chats", phone),
-    { last_updated: serverTimestamp() },
-    { merge: true }
-  );
+  const chatRef = db.doc(`chats/${phone}`);
+  await setDoc(chatRef, { last_updated: serverTimestamp() }, { merge: true });
 
   await logMessage({
     phone,
