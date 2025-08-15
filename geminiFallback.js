@@ -55,12 +55,14 @@ async function getGeminiReply(userText) {
     const result = await chat.sendMessage(userText);
 
     console.log("✅ Gemini responded");
-    const responseText = result.response.text().trim();
-    console.log("📄 Raw Gemini response:\n", responseText);
+    const raw = result.response.text().trim();
+    console.log("📄 Raw Gemini response:\n", raw);
 
-    const jsonStart = responseText.indexOf("{");
-    const jsonText = responseText.slice(jsonStart);
+    // Remove triple backticks and anything outside the JSON block
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("No valid JSON block found");
 
+    const jsonText = jsonMatch[0];
     console.log("🧾 Extracted JSON snippet:\n", jsonText);
 
     const parsed = JSON.parse(jsonText);

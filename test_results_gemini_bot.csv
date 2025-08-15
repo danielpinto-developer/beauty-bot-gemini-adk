@@ -1,10 +1,29 @@
-Test #,Input Message,Status Code,Response Preview
-1,¿Dónde están ubicados?,200,OK
-2,¿Me pueden compartir su ubicación?,200,OK
+Test #,Input Message,Status Code,Gemini Response
+1,¿Dónde están ubicados?,502,"<!DOCTYPE html> <html lang=""en"">   <head>     <meta charset=""utf-8"">     <meta name=""viewport"" content=""width=device-width, initial-scale=1"">     <title>502</title>     <style>@font-face {   font-family: ""Roobert"";   font-weight: 500;   font-style: normal;   font-stretch: normal;   src: url(""data:fo"
+2,¿Me pueden compartir su ubicación?,502,"<!DOCTYPE html> <html lang=""en"">   <head>     <meta charset=""utf-8"">     <meta name=""viewport"" content=""width=device-width, initial-scale=1"">     <title>502</title>     <style>@font-face {   font-family: ""Roobert"";   font-weight: 500;   font-style: normal;   font-stretch: normal;   src: url(""data:fo"
 3,¿Dónde queda el salón?,200,OK
 4,¿Tienen Google Maps?,200,OK
-5,¿Dónde está Beauty Blossoms?,200,OK
+5,¿Dónde está Beauty Blossoms?,502,"<!DOCTYPE html> <html lang=""en"">   <head>     <meta charset=""utf-8"">     <meta name=""viewport"" content=""width=device-width, initial-scale=1"">     <title>502</title>     <style>@font-face {   font-family: ""Roobert"";   font-weight: 500;   font-style: normal;   font-stretch: normal;   src: url(""data:fo"
 6,¿Están en Zapopan?,200,OK
 7,¿Pueden mandarme la dirección?,200,OK
 8,¿Cerca de qué están ubicados?,200,OK
 9,¿Están por Walmart La Cima?,200,OK
+10,¿Mandan su ubicación?,200,OK
+11,¿Cuánto cuesta el servicio de uñas acrílicas?,200,OK
+12,Precio de pestañas clásicas por favor,200,OK
+13,¿Cuánto cobran por acripie?,200,OK
+14,¿Cuánto es el lifting de pestañas?,502,"<!DOCTYPE html> <html lang=""en"">   <head>     <meta charset=""utf-8"">     <meta name=""viewport"" content=""width=device-width, initial-scale=1"">     <title>502</title>     <style>@font-face {   font-family: ""Roobert"";   font-weight: 500;   font-style: normal;   font-stretch: normal;   src: url(""data:fo"
+15,¿Tienen lista de precios?,200,OK
+16,¿Mándame costos de los servicios?,200,OK
+17,¿Qué precio tienen las cejas con pigmento?,200,OK
+18,¿Cuánto cuesta el diseño 4K?,200,OK
+19,¿Cuál es el precio del BBLips?,200,OK
+20,¿Cuánto por unas cejas laminadas?,200,OK
+21,"Hola, quiero cita para acrílico mañana a las 4pm",200,OK
+22,Quiero agendar lifting de cejas el viernes 11am,200,OK
+23,Puedo reservar para pestañas hoy a las 2:30pm?,200,OK
+24,Agendar para bblips sábado a las 3,200,OK
+25,Quiero acrílicas mañana 1:30pm,200,OK
+26,Necesito cita para lifting pestañas el lunes 9am,200,OK
+27,Agenda porfa unas uñas para mañana a las 6,200,OK
+28,Cita mañana 12pm para acrílico,200,OK
