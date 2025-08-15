@@ -1,3 +1,10 @@
 Test #,Input Message,Status Code,Response Preview
-1,¿Dónde están ubicados?,ERROR,"HTTPSConnectionPool(host='beauty-bot-gemini-adk.onrender.com', port=443): Read timed out. (read timeout=10)"
-2,¿Me pueden compartir su ubicación?,ERROR,"HTTPSConnectionPool(host='beauty-bot-gemini-adk.onrender.com', port=443): Read timed out. (read timeout=10)"
+1,¿Dónde están ubicados?,200,OK
+2,¿Me pueden compartir su ubicación?,200,OK
+3,¿Dónde queda el salón?,200,OK
+4,¿Tienen Google Maps?,200,OK
+5,¿Dónde está Beauty Blossoms?,200,OK
+6,¿Están en Zapopan?,200,OK
+7,¿Pueden mandarme la dirección?,200,OK
+8,¿Cerca de qué están ubicados?,200,OK
+9,¿Están por Walmart La Cima?,200,OK
