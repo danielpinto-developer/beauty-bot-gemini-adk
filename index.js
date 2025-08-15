@@ -1,150 +1,105 @@
-const { sendMessage } = require("./whatsapp");
-const { getGeminiReply } = require("./geminiFallback");
-const { db, admin } = require("./firebase");
+require("dotenv").config();
+const express = require("express");
+const app = express();
+const port = process.env.PORT || 8080;
 
-const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
+const { messageDispatcher } = require("./messageDispatcher");
+const { handleUnsupportedMedia } = require("./mediaHandler");
+const { admin, db } = require("./firebase");
 
-const precios = {
-  "uñas acrílicas": "$350 MXN",
-  "pestañas clásicas": "$300 MXN",
-  "lifting de cejas": "$280 MXN",
-  "lifting de pestañas": "$280 MXN",
-  bblips: "$400 MXN",
-  acripie: "$220 MXN",
-};
+app.use(express.json());
 
-const notifyMoni = async (phone, reason) => {
-  console.log(`📣 Notify Moni: ${phone} needs manual follow-up (${reason})`);
-};
+app.post("/", async (req, res) => {
+  const { phone, text } = req.body;
 
-async function logMessage({
-  phone,
-  text,
-  sender,
-  direction,
-  intent,
-  confidence,
-  action,
-  slots,
-}) {
-  const data = {
-    text,
-    sender,
-    direction,
-    timestamp: serverTimestamp(),
-  };
-  if (intent) data.intent = intent;
-  if (confidence) data.confidence = confidence;
-  if (action) data.action = action;
-  if (slots) data.slots = slots;
+  try {
+    await messageDispatcher({ phone, text });
+    res.status(200).send("OK");
+  } catch (err) {
+    console.error("❌ Webhook error:", err);
+    res.status(500).send("Webhook failed");
+  }
+});
 
-  await admin
-    .firestore()
-    .collection("chats")
-    .doc(phone)
-    .collection("messages")
-    .add(data);
-}
+app.get("/webhook", (req, res) => {
+  const VERIFY_TOKEN = "beauty-bot-token";
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
 
-function formatFecha(fechaStr) {
-  const now = new Date();
-  let targetDate;
+  console.log("🔍 Webhook verify hit");
+  console.log("  mode:", mode);
+  console.log("  token:", token);
+  console.log("  challenge:", challenge);
 
-  if (fechaStr?.toLowerCase() === "mañana") {
-    targetDate = new Date(now);
-    targetDate.setDate(now.getDate() + 1);
-  } else if (fechaStr?.toLowerCase() === "hoy") {
-    targetDate = new Date(now);
-  } else {
-    return fechaStr;
+  if (mode === "subscribe" && token === VERIFY_TOKEN) {
+    console.log("✅ Webhook verified");
+    return res.status(200).send(challenge);
   }
 
-  return new Intl.DateTimeFormat("es-MX", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  })
-    .format(targetDate)
-    .replace(/\b\w/, (l) => l.toUpperCase());
-}
+  console.log("❌ Token mismatch or bad mode");
+  res.sendStatus(403);
+});
 
-async function messageDispatcher({ phone, text }) {
-  console.log("📬 messageDispatcher", { phone, text });
+app.post("/webhook", async (req, res) => {
+  try {
+    const body = req.body;
+    const messageEntry = body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
 
-  const { intent, slots, response } = await getGeminiReply(text);
-  const { servicio, fecha, hora } = slots || {};
-
-  await admin
-    .firestore()
-    .doc(`chats/${phone}`)
-    .set({ last_updated: serverTimestamp() }, { merge: true });
-
-  await logMessage({
-    phone,
-    text,
-    sender: "user",
-    direction: "inbound",
-    intent,
-    slots,
-  });
-
-  let replyText = response;
-
-  if (intent === "book_appointment") {
-    const price = servicio ? precios[servicio.toLowerCase()] : null;
-    const fechaFormatted = formatFecha(fecha);
-
-    if (fecha && hora && servicio) {
-      replyText = `Perfecto 💅 Cita para *${servicio}* el *${fechaFormatted}* a las *${hora}*${
-        price ? ` (costo: ${price})` : ""
-      }. En unos momentos confirmamos la disponibilidad de tu cita ✨`;
-    } else {
-      const missing = [];
-      if (!servicio) missing.push("servicio");
-      if (!fecha) missing.push("fecha");
-      if (!hora) missing.push("hora");
-      replyText = `Solo necesito ${missing.join(", ")} para agendar tu cita 💅`;
+    if (!messageEntry) {
+      console.log("⚠️ No message found in webhook payload.");
+      return res.status(200).send("No message to process");
     }
 
-    await notifyMoni(
-      phone,
-      `Cita solicitada: ${fechaFormatted || "?"} ${hora || "?"} (${
-        servicio || "?"
-      })`
-    );
+    const phone = messageEntry.from;
+    const messageText = messageEntry.text?.body;
+    const messageId = messageEntry.id;
+
+    if (!phone || !messageText) {
+      console.log("❌ Missing phone or message text");
+      return res.status(200).send("Invalid payload");
+    }
+
+    console.log("📞 From:", phone);
+    console.log("💬 Text:", messageText);
+
+    const messageMetaRef = db.doc(`chats/${phone}/metadata/lastMessage`);
+    const previous = await messageMetaRef.get();
+    if (previous.exists && previous.data().id === messageId) {
+      console.log("🔁 Duplicate message detected. Skipping.");
+      return res.status(200).send("Duplicate ignored");
+    }
+    await messageMetaRef.set({ id: messageId });
+
+    const mediaCheck = handleUnsupportedMedia(messageEntry);
+    if (mediaCheck) {
+      await messageDispatcher({
+        phone: mediaCheck.phone,
+        text: `[${messageEntry.type} message]`,
+        nlpResult: {
+          intent: "media",
+          action: mediaCheck.action,
+          response: mediaCheck.response,
+        },
+        slotResult: {},
+      });
+      return res.status(200).send("Media handled");
+    }
+
+    await messageDispatcher({ phone, text: messageText });
+    return res.status(200).send("Message processed");
+  } catch (error) {
+    console.error("❌ Webhook error:", error);
+    return res.status(500).send("Internal server error");
   }
+});
 
-  if (intent === "faq_price" && servicio) {
-    const price = precios[servicio.toLowerCase()];
-    replyText = price
-      ? `El precio de *${servicio}* es de ${price} 💵`
-      : `Ese servicio tiene precios variables. ¿Te gustaría más información?`;
-  }
+// ✅ Add this route for health check or root visit
+app.get("/", (req, res) => {
+  res.send("✅ Gemini BeautyBot server is running.");
+});
 
-  if (intent === "faq_location") {
-    replyText = `📍 Ubicación: Beauty Blossoms en Google Maps\nhttps://maps.app.goo.gl/CtavKUYUV3zyvaLU6`;
-  }
-
-  if (intent === "gratitude") {
-    replyText = `¡Con gusto hermosa! 💖 Estamos aquí para ti en Beauty Blossoms 🌸`;
-  }
-
-  if (intent === "greeting") {
-    replyText = `¡Hola hermosa! 💖 ¿Te gustaría agendar unas uñas, pestañas o cejas? Cuéntame qué necesitas y para qué día.`;
-  }
-
-  await logMessage({
-    phone,
-    text: replyText,
-    sender: "bot",
-    direction: "outbound",
-    intent,
-    slots,
-  });
-
-  await sendMessage({ to: phone, text: replyText });
-
-  return replyText; // 🔥 For testing return
-}
-
-module.exports = { messageDispatcher };
+// ✅ This is CRUCIAL — keeps your app alive on Render
+app.listen(port, () => {
+  console.log(`🚀 Server live on port ${port}`);
+});
