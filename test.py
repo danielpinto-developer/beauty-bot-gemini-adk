@@ -1,5 +1,7 @@
 import csv
 import requests
+import time
+
 
 # Endpoint of your deployed bot
 BOT_URL = "https://beauty-bot-gemini-adk.onrender.com"
@@ -26,6 +28,7 @@ def main():
     with open(OUTPUT_FILE, mode="w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["Test #", "Input Message", "Status Code", "Response Preview"])
+        time.sleep(5)
 
         for i, input_text in enumerate(test_inputs, start=1):
             status, response = run_test(phone, input_text)
