@@ -10,7 +10,7 @@ if (!process.env.GEMINI_API_KEY) {
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-pro" });
 
-console.log("✅ Gemini model initialized: models/gemini-1.5-pro");
+console.log("✅ Gemini model initialized: gemini-1.5-pro");
 
 const systemPrompt = `
 Eres BeautyBot, la asistente profesional y cálida de Beauty Blossoms Studio, un salón de belleza en Zapopan, Jalisco.
@@ -53,21 +53,13 @@ async function getGeminiReply(userText) {
     console.log("📨 Sending user message to Gemini:", userText);
 
     const result = await chat.sendMessage(userText);
+
     console.log("✅ Gemini responded");
+    const responseText = result.response.text().trim();
+    console.log("📄 Raw Gemini response:\n", responseText);
 
-    let text = result.response.text().trim();
-    console.log("📄 Raw Gemini response:\n", text);
-
-    // Clean up triple backtick and whitespace junk
-    text = text
-      .replace(/^```json/, "")
-      .replace(/^```/, "")
-      .replace(/```$/, "")
-      .trim();
-
-    const jsonStart = text.indexOf("{");
-    const jsonEnd = text.lastIndexOf("}");
-    const jsonText = text.slice(jsonStart, jsonEnd + 1);
+    const jsonStart = responseText.indexOf("{");
+    const jsonText = responseText.slice(jsonStart);
 
     console.log("🧾 Extracted JSON snippet:\n", jsonText);
 
