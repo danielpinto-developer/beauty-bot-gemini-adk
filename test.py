@@ -1,6 +1,7 @@
 import csv
 import requests
 import time
+import json
 
 # Endpoint of your deployed bot
 BOT_URL = "https://beauty-bot-gemini-adk.onrender.com"
@@ -33,18 +34,18 @@ def main():
             status, response = run_test(phone, input_text)
             print(f"[{i:03}] {status} — {input_text}")
 
-            # Try to extract the "response" field from Gemini's JSON
+            # Safely extract "response" field from Gemini JSON
             message = ""
             try:
                 json_start = response.find('{')
                 json_text = response[json_start:]
-                parsed = eval(json_text)  # You could also use json.loads if formatted safely
-                message = parsed.get("response", "")[:300].replace("\n", " ")
+                parsed = json.loads(json_text)
+                message = parsed.get("response", "").replace("\n", " ").strip()
             except:
-                message = response[:300].replace("\n", " ")
+                message = response.replace("\n", " ").strip()
 
             writer.writerow([i, input_text, status, message])
-            time.sleep(1.2)  # Add slight delay to avoid overloading the bot
+            time.sleep(1.2)  # Delay to avoid rate-limiting
 
     print(f"\n✅ Done. Results saved to {OUTPUT_FILE}")
 
