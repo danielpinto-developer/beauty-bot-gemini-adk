@@ -86,6 +86,113 @@ const precios = {
   "cuerpo completo 5": "$2750 MXN",
 };
 
+const servicioSynonyms = {
+  // 💅 UÑAS
+  uñas: "uñas acrílicas",
+  acrílicas: "uñas acrílicas",
+  "uñas acrilicas": "uñas acrílicas",
+  "soft gel": "uñas soft gel",
+  "uñas soft": "uñas soft gel",
+  "gelish manos": "gelish",
+  "gelish pies": "gelish en pies",
+  "gel para pies": "gelish en pies",
+  "gelish pedicure": "gelish en pies",
+  "pedicure con gelish": "gelish en pies",
+  "gelish spa": "gelish",
+  "rubber base": "rubber",
+  "rubber nails": "rubber",
+  "acri pies": "acripie",
+  "acripie spa": "acripie",
+  "spa de pies": "pedicure spa",
+
+  // 👁️ PESTAÑAS
+  "pestañas naturales": "pestañas clásicas",
+  clásicas: "pestañas clásicas",
+  rimel: "pestañas rimel",
+  "efecto rimel": "pestañas rimel",
+  híbridas: "pestañas híbridas",
+  "efecto mojado": "pestañas mojado",
+  mojado: "pestañas mojado",
+  volumen: "volumen ruso",
+  "volumen ruso": "volumen ruso",
+  "volumen hawaiano": "volumen hawaiano",
+  "volumen americano": "volumen americano",
+  "mega volumen": "mega volumen",
+  "efecto anime": "pestañas efecto especial",
+  "efecto wispy": "pestañas efecto especial",
+  "efecto bratz": "pestañas efecto especial",
+  "efecto coreano": "pestañas efecto especial",
+  "efecto fox": "pestañas efecto especial",
+  "fox eye": "pestañas efecto especial",
+
+  // 👁️ CEJAS
+  cejas: "diseño de cejas hd",
+  "diseño de cejas": "diseño de cejas hd",
+  "diseño hd": "diseño de cejas hd",
+  "cejas 4k": "diseño de cejas 4k",
+  "diseño 4k": "diseño de cejas 4k",
+  "lifting de cejas": "lifting de cejas",
+  "laminado de cejas": "lifting de cejas",
+  "microblading cejas": "microblading",
+  microshading: "microshading pro",
+  "consulta de cejas": "consulta microblading",
+
+  // 🧖‍♀️ LABIOS Y FACIALES
+  "bb lips": "bblips",
+  bblips: "bblips",
+  "bb glow": "bb glow",
+  "bb glow facial": "bb glow",
+  "relleno de labios": "relleno de labios",
+
+  // ✨ CABELLO
+  "baño de color": "baño de color",
+  tinte: "tinte",
+  matiz: "matiz",
+  retoque: "retoque de caña",
+  "retoque de canas": "retoque de caña",
+  "diseño de color": "diseño de color",
+  corte: "corte de dama",
+  "corte de mujer": "corte de dama",
+  keratina: "keratina",
+  nanoplastia: "nanoplastia japonesa",
+  "botox capilar": "botox capilar",
+  "tratamiento capilar": "tratamiento capilar premium",
+
+  // 🧽 DEPILACIÓN (ZONAS)
+  "depilación bigote": "bigote",
+  "depilación cejas": "cejas",
+  "depilación patilla": "patilla",
+  "depilación barbilla": "barbilla",
+  "depilación mejillas": "mejillas",
+  "depilación axila": "axila",
+  "depilación brazos": "brazos completos",
+  "depilación medios brazos": "medios brazos",
+  "depilación piernas": "piernas completas",
+  "depilación medias piernas": "medias piernas",
+  "depilación bikini": "bikini",
+  "bikini brasileño": "bikini brasileño",
+  "depilación brasileña": "bikini brasileño",
+  "línea interglútea": "línea interglúeta",
+  interglútea: "línea interglúeta",
+  fosas: "fosas nasales",
+  "fosas nasales": "fosas nasales",
+  "espalda completa": "espalda completa",
+  "media espalda": "media espalda baja",
+  "espalda baja": "media espalda baja",
+  abdomen: "abdomen",
+  glúteos: "glúteos completos",
+  "glúteos media": "glúteos media",
+
+  // 🎁 DEPILACIÓN (PAQUETES)
+  "cara completa 1 sesión": "cara completa 1",
+  "cara completa paquete": "cara completa 1",
+  "piernas y brazos 1 sesión": "piernas y brazos 1",
+  "piernas completas y brazos": "piernas y brazos 1",
+  "cuerpo completo": "cuerpo completo 1",
+  "cuerpo completo 1 sesión": "cuerpo completo 1",
+  "paquete cuerpo completo": "cuerpo completo 1",
+};
+
 const notifyMoni = async (phone, reason) => {
   console.log(`📣 Notify Moni: ${phone} needs manual follow-up (${reason})`);
 };
@@ -164,7 +271,9 @@ async function messageDispatcher({ phone, text }) {
   let replyText = response;
 
   if (intent === "book_appointment") {
-    const price = servicio ? precios[servicio.toLowerCase()] : null;
+    const key =
+      servicioSynonyms[servicio?.toLowerCase()] || servicio?.toLowerCase();
+    const price = key ? precios[key] : null;
     const fechaFormatted = formatFecha(fecha);
 
     if (fecha && hora && servicio) {
@@ -188,7 +297,9 @@ async function messageDispatcher({ phone, text }) {
   }
 
   if (intent === "faq_price" && servicio) {
-    const price = precios[servicio.toLowerCase()];
+    const key =
+      servicioSynonyms[servicio.toLowerCase()] || servicio.toLowerCase();
+    const price = precios[key];
     replyText = price
       ? `El precio de *${servicio}* es de ${price} 💵`
       : `Ese servicio tiene precios variables. ¿Te gustaría más información?`;
