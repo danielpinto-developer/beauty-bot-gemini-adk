@@ -12,6 +12,94 @@ const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-pro" });
 
 console.log("✅ Gemini model initialized: gemini-1.5-pro");
 
+const validServicios = [
+  // 💅 NAIL BAR
+  "manicure spa",
+  "manicure ruso",
+  "uñas acrílicas",
+  "uñas soft gel",
+  "gelish",
+  "rubber",
+  "pedicure spa",
+  "acripie",
+  "gelish en pies",
+
+  // 👁️ LASH STUDIO
+  "pestañas clásicas",
+  "pestañas rimel",
+  "pestañas híbridas",
+  "pestañas mojado",
+  "volumen hawaiano",
+  "volumen ruso",
+  "volumen americano",
+  "pestañas efecto especial",
+  "mega volumen",
+
+  // 🧖‍♀️ BEAUTY LAB
+  "bblips",
+  "bb glow",
+  "relleno de labios",
+
+  // 👁️ CEJAS
+  "lifting de pestañas",
+  "lifting de cejas",
+  "diseño de cejas hd",
+  "diseño de cejas 4k",
+  "consulta microblading",
+  "microblading",
+  "microshading pro",
+
+  // ✨ HAIR & GLOW
+  "baño de color",
+  "tinte",
+  "matiz",
+  "retoque de caña",
+  "diseño de color",
+  "corte de dama",
+  "keratina",
+  "nanoplastia japonesa",
+  "botox capilar",
+  "tratamiento capilar premium",
+
+  // 🧽 DEPILACIÓN INDIVIDUAL
+  "bigote",
+  "cejas",
+  "patilla",
+  "barbilla",
+  "mejillas",
+  "axila",
+  "piernas completas",
+  "medias piernas",
+  "bikini",
+  "bikini brasileño",
+  "línea interglúeta",
+  "fosas nasales",
+  "espalda completa",
+  "media espalda baja",
+  "abdomen",
+  "brazos completos",
+  "medios brazos",
+  "glúteos media",
+  "glúteos completos",
+
+  // 🎁 DEPILACIÓN PAQUETES
+  "cara completa 1",
+  "cara completa 3",
+  "cara completa 5",
+  "piernas y brazos 1",
+  "piernas y brazos 3",
+  "piernas y brazos 5",
+  "cuerpo completo 1",
+  "cuerpo completo 3",
+  "cuerpo completo 5",
+];
+
+function validateServicioKey(key) {
+  if (!key) return null;
+  const cleaned = key.toLowerCase().trim();
+  return validServicios.includes(cleaned) ? cleaned : null;
+}
+
 const systemPrompt = `
 Eres BeautyBot, la asistente profesional y cálida de Beauty Blossoms Studio, un salón de belleza en Zapopan, Jalisco.
 
@@ -34,6 +122,9 @@ Responde en este formato JSON **exacto**:
   },
   "response": "respuesta cálida para WhatsApp"
 }
+
+IMPORTANTE: el campo "servicio" debe coincidir exactamente con uno de los siguientes:
+${validServicios.join(", ")}
 `;
 
 async function getGeminiReply(userText) {
@@ -58,7 +149,6 @@ async function getGeminiReply(userText) {
     const raw = result.response.text().trim();
     console.log("📄 Raw Gemini response:\n", raw);
 
-    // Remove triple backticks and anything outside the JSON block
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("No valid JSON block found");
 
@@ -67,12 +157,30 @@ async function getGeminiReply(userText) {
 
     const parsed = JSON.parse(jsonText);
     console.log("✅ Parsed JSON response:", parsed);
-    return parsed;
+
+    // Validate servicio field only
+    const cleanedServicio = validateServicioKey(parsed.slots?.servicio);
+
+    return {
+      intent: parsed.intent || "fallback",
+      slots: {
+        servicio: cleanedServicio,
+        fecha: parsed.slots?.fecha || null,
+        hora: parsed.slots?.hora || null,
+      },
+      response:
+        parsed.response ||
+        "Lo siento, no entendí muy bien eso 🤖 ¿Podrías decírmelo de otra forma?",
+    };
   } catch (err) {
     console.error("❌ Gemini fallback error:", err.message || err);
     return {
       intent: "fallback",
-      slots: {},
+      slots: {
+        servicio: null,
+        fecha: null,
+        hora: null,
+      },
       response:
         "Lo siento, no entendí muy bien eso 🤖 ¿Podrías decírmelo de otra forma?",
     };
