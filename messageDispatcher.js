@@ -8,7 +8,7 @@ const precios = {
   // 💅 NAIL BAR
   "manicure spa": "$250 MXN",
   "manicure ruso": "$180 MXN",
-  "uñas acrílicas": "$250 MXN",
+  "uñas acrílicas": "Desde $250 MXN",
   "uñas soft gel": "$350 MXN",
   gelish: "$180 MXN",
   rubber: "$200 MXN",
@@ -26,6 +26,15 @@ const precios = {
   "volumen americano": "$600 MXN",
   "pestañas efecto especial": "$600 MXN",
   "mega volumen": "$700 MXN",
+  // 🎨 Estilos especiales extraídos de carta
+  "pestañas chopy": "$600 MXN",
+  "pestañas bratz": "$600 MXN",
+  "pestañas wispy": "$600 MXN",
+  "pestañas anime": "$600 MXN",
+  "pestañas coreano": "$600 MXN",
+  "pestañas foxy": "$600 MXN",
+  "pestañas eye liner": "$600 MXN",
+  "degradado de color": "$900 MXN",
 
   // 🧖‍♀️ BEAUTY LAB
   bblips: "$500 MXN",
@@ -34,23 +43,23 @@ const precios = {
 
   // 👁️ CEJAS
   "lifting de pestañas": "$350 MXN",
-  "lifting de cejas": "$280 MXN",
+  "lifting de cejas": "FALTANTE",
   "diseño de cejas hd": "$350 MXN",
   "diseño de cejas 4k": "$200 MXN",
   "consulta microblading": "$200 MXN",
-  microblading: "$2000 a $2800 MXN",
-  "microshading pro": "$2300 a $2500 MXN",
+  microblading: "De $2000 a $2800 MXN",
+  "microshading pro": "De $2300 a $2500 MXN",
 
   // ✨ HAIR & GLOW
   "baño de color": "$400 MXN",
   tinte: "$600 MXN",
   matiz: "$400 MXN",
   "retoque de caña": "$650 MXN",
-  "diseño de color": "$1500 MXN en adelante",
+  "diseño de color": "Desde $1500 MXN",
   "corte de dama": "$350 MXN",
-  keratina: "$900 MXN en adelante",
-  "nanoplastia japonesa": "$800 MXN en adelante",
-  "botox capilar": "$700 MXN en adelante",
+  keratina: "Desde $900 MXN",
+  "nanoplastia japonesa": "Desde $800 MXN",
+  "botox capilar": "Desde $700 MXN",
   "tratamiento capilar premium": "$550 MXN",
 
   // 🧽 DEPILACIÓN (Individual)
@@ -64,7 +73,7 @@ const precios = {
   "medias piernas": "$300 MXN",
   bikini: "$300 MXN",
   "bikini brasileño": "$350 MXN",
-  "línea interglúeta": "$150 MXN",
+  "línea interglútea": "$150 MXN",
   "fosas nasales": "$80 MXN",
   "espalda completa": "$330 MXN",
   "media espalda baja": "$200 MXN",
@@ -76,14 +85,14 @@ const precios = {
 
   // 🎁 DEPILACIÓN (Paquetes)
   "cara completa 1": "$550 MXN",
-  "cara completa 3": "$1320 MXN",
-  "cara completa 5": "$1650 MXN",
+  "cara completa 3": "$1,320 MXN",
+  "cara completa 5": "$1,650 MXN",
   "piernas y brazos 1": "$650 MXN",
-  "piernas y brazos 3": "$1560 MXN",
-  "piernas y brazos 5": "$1950 MXN",
-  "cuerpo completo 1": "$1900 MXN",
-  "cuerpo completo 3": "$2640 MXN",
-  "cuerpo completo 5": "$2750 MXN",
+  "piernas y brazos 3": "$1,560 MXN",
+  "piernas y brazos 5": "$1,950 MXN",
+  "cuerpo completo 1": "$1,900 MXN",
+  "cuerpo completo 3": "$2,640 MXN",
+  "cuerpo completo 5": "$2,750 MXN",
 };
 
 const notifyMoni = async (phone, reason) => {

@@ -34,11 +34,22 @@ const validServicios = [
   "volumen americano",
   "pestañas efecto especial",
   "mega volumen",
+  "chopy",
+  "bratz",
+  "wispy",
+  "anime",
+  "coreano",
+  "foxy",
+  "eye liner",
+  "degradado de color",
 
   // 🧖‍♀️ BEAUTY LAB
   "bblips",
   "bb glow",
+  "bb glow facial",
   "relleno de labios",
+  "enzimas reductoras (corporal)",
+  "armonización facial con enzimas",
 
   // 👁️ CEJAS
   "lifting de pestañas",
@@ -70,6 +81,7 @@ const validServicios = [
   "axila",
   "piernas completas",
   "medias piernas",
+  "piernas",
   "bikini",
   "bikini brasileño",
   "línea interglúeta",
@@ -78,6 +90,7 @@ const validServicios = [
   "media espalda baja",
   "abdomen",
   "brazos completos",
+  "brazos",
   "medios brazos",
   "glúteos media",
   "glúteos completos",
