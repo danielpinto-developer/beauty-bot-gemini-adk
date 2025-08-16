@@ -3,3 +3,4 @@ Test #,Input Message,Status Code,Gemini Response
 2,¿Dónde están?,200,OK
 3,¿En qué parte están?,200,OK
 4,¿Cuál es su dirección?,200,OK
+5,¿Me puedes dar la dirección?,200,OK
