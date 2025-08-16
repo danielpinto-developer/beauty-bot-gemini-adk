@@ -5,12 +5,85 @@ const { db, admin } = require("./firebase");
 const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
 
 const precios = {
-  "uñas acrílicas": "$350 MXN",
-  "pestañas clásicas": "$300 MXN",
+  // 💅 NAIL BAR
+  "manicure spa": "$250 MXN",
+  "manicure ruso": "$180 MXN",
+  "uñas acrílicas": "$250 MXN",
+  "uñas soft gel": "$350 MXN",
+  gelish: "$180 MXN",
+  rubber: "$200 MXN",
+  "pedicure spa": "$400 MXN",
+  acripie: "$300 MXN",
+  "gelish en pies": "$200 MXN",
+
+  // 👁️ LASH STUDIO
+  "pestañas clásicas": "$400 MXN",
+  "pestañas rimel": "$450 MXN",
+  "pestañas híbridas": "$500 MXN",
+  "pestañas mojado": "$450 MXN",
+  "volumen hawaiano": "$600 MXN",
+  "volumen ruso": "$600 MXN",
+  "volumen americano": "$600 MXN",
+  "pestañas efecto especial": "$600 MXN",
+  "mega volumen": "$700 MXN",
+
+  // 🧖‍♀️ BEAUTY LAB
+  bblips: "$500 MXN",
+  "bb glow": "$550 MXN",
+  "relleno de labios": "$4900 MXN",
+
+  // 👁️ CEJAS
+  "lifting de pestañas": "$350 MXN",
   "lifting de cejas": "$280 MXN",
-  "lifting de pestañas": "$280 MXN",
-  bblips: "$400 MXN",
-  acripie: "$220 MXN",
+  "diseño de cejas hd": "$350 MXN",
+  "diseño de cejas 4k": "$200 MXN",
+  "consulta microblading": "$200 MXN",
+  microblading: "$2000 a $2800 MXN",
+  "microshading pro": "$2300 a $2500 MXN",
+
+  // ✨ HAIR & GLOW
+  "baño de color": "$400 MXN",
+  tinte: "$600 MXN",
+  matiz: "$400 MXN",
+  "retoque de caña": "$650 MXN",
+  "diseño de color": "$1500 MXN en adelante",
+  "corte de dama": "$350 MXN",
+  keratina: "$900 MXN en adelante",
+  "nanoplastia japonesa": "$800 MXN en adelante",
+  "botox capilar": "$700 MXN en adelante",
+  "tratamiento capilar premium": "$550 MXN",
+
+  // 🧽 DEPILACIÓN (Individual)
+  bigote: "$80 MXN",
+  cejas: "$100 MXN",
+  patilla: "$200 MXN",
+  barbilla: "$80 MXN",
+  mejillas: "$150 MXN",
+  axila: "$130 MXN",
+  "piernas completas": "$550 MXN",
+  "medias piernas": "$300 MXN",
+  bikini: "$300 MXN",
+  "bikini brasileño": "$350 MXN",
+  "línea interglúeta": "$150 MXN",
+  "fosas nasales": "$80 MXN",
+  "espalda completa": "$330 MXN",
+  "media espalda baja": "$200 MXN",
+  abdomen: "$200 MXN",
+  "brazos completos": "$330 MXN",
+  "medios brazos": "$200 MXN",
+  "glúteos media": "$150 MXN",
+  "glúteos completos": "$200 MXN",
+
+  // 🎁 DEPILACIÓN (Paquetes)
+  "cara completa 1": "$550 MXN",
+  "cara completa 3": "$1320 MXN",
+  "cara completa 5": "$1650 MXN",
+  "piernas y brazos 1": "$650 MXN",
+  "piernas y brazos 3": "$1560 MXN",
+  "piernas y brazos 5": "$1950 MXN",
+  "cuerpo completo 1": "$1900 MXN",
+  "cuerpo completo 3": "$2640 MXN",
+  "cuerpo completo 5": "$2750 MXN",
 };
 
 const notifyMoni = async (phone, reason) => {

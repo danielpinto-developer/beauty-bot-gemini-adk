@@ -1,9 +1,9 @@
 Test #,Input Message,Status Code,Gemini Response
-1,¿Dónde están ubicados?,502,"<!DOCTYPE html> <html lang=""en"">   <head>     <meta charset=""utf-8"">     <meta name=""viewport"" content=""width=device-width, initial-scale=1"">     <title>502</title>     <style>@font-face {   font-family: ""Roobert"";   font-weight: 500;   font-style: normal;   font-stretch: normal;   src: url(""data:fo"
-2,¿Me pueden compartir su ubicación?,502,"<!DOCTYPE html> <html lang=""en"">   <head>     <meta charset=""utf-8"">     <meta name=""viewport"" content=""width=device-width, initial-scale=1"">     <title>502</title>     <style>@font-face {   font-family: ""Roobert"";   font-weight: 500;   font-style: normal;   font-stretch: normal;   src: url(""data:fo"
+1,¿Dónde están ubicados?,200,OK
+2,¿Me pueden compartir su ubicación?,200,OK
 3,¿Dónde queda el salón?,200,OK
 4,¿Tienen Google Maps?,200,OK
-5,¿Dónde está Beauty Blossoms?,502,"<!DOCTYPE html> <html lang=""en"">   <head>     <meta charset=""utf-8"">     <meta name=""viewport"" content=""width=device-width, initial-scale=1"">     <title>502</title>     <style>@font-face {   font-family: ""Roobert"";   font-weight: 500;   font-style: normal;   font-stretch: normal;   src: url(""data:fo"
+5,¿Dónde está Beauty Blossoms?,200,OK
 6,¿Están en Zapopan?,200,OK
 7,¿Pueden mandarme la dirección?,200,OK
 8,¿Cerca de qué están ubicados?,200,OK
@@ -12,7 +12,7 @@ Test #,Input Message,Status Code,Gemini Response
 11,¿Cuánto cuesta el servicio de uñas acrílicas?,200,OK
 12,Precio de pestañas clásicas por favor,200,OK
 13,¿Cuánto cobran por acripie?,200,OK
-14,¿Cuánto es el lifting de pestañas?,502,"<!DOCTYPE html> <html lang=""en"">   <head>     <meta charset=""utf-8"">     <meta name=""viewport"" content=""width=device-width, initial-scale=1"">     <title>502</title>     <style>@font-face {   font-family: ""Roobert"";   font-weight: 500;   font-style: normal;   font-stretch: normal;   src: url(""data:fo"
+14,¿Cuánto es el lifting de pestañas?,200,OK
 15,¿Tienen lista de precios?,200,OK
 16,¿Mándame costos de los servicios?,200,OK
 17,¿Qué precio tienen las cejas con pigmento?,200,OK
@@ -27,3 +27,55 @@ Test #,Input Message,Status Code,Gemini Response
 26,Necesito cita para lifting pestañas el lunes 9am,200,OK
 27,Agenda porfa unas uñas para mañana a las 6,200,OK
 28,Cita mañana 12pm para acrílico,200,OK
+29,Uñas el martes a las 10am,200,OK
+30,Reservar cejas viernes 3pm,200,OK
+31,Quiero una cita para acrílico,200,OK
+32,Cita de pestañas mañana por la tarde,200,OK
+33,Agendar cejas pero no sé la hora,200,OK
+34,Me interesa acripie este sábado,200,OK
+35,Uñas gelish por la mañana,200,OK
+36,Puedo ir hoy pero no sé qué hay disponible,200,OK
+37,Reservar bblips la semana que viene,200,OK
+38,Cita para pies por la tarde,200,OK
+39,¿Tienen algo disponible para uñas hoy?,200,OK
+40,Lifting pestañas mañana sin hora,200,OK
+41,Hola hermosa,200,OK
+42,Gracias por responder,200,OK
+43,Mil gracias,200,OK
+44,¡Qué linda atención!,200,OK
+45,Buenas tardes,200,OK
+46,"Hola, ¿me puedes ayudar?",200,OK
+47,Hola guapa,200,OK
+48,Gracias 💖,200,OK
+49,"Gracias, muy amable",200,OK
+50,Holaa,200,OK
+51,¿Tienen Instagram?,200,OK
+52,¿Dónde veo sus trabajos?,200,OK
+53,¿Tienen catálogo?,200,OK
+54,¿Hay promociones esta semana?,200,OK
+55,Pásame el Instagram del estudio,200,OK
+56,¿Tienes fotos de uñas acrílicas?,200,OK
+57,¿Manejan promociones de pestañas?,200,OK
+58,¿Puedo ver los diseños disponibles?,200,OK
+59,¿Dónde publican los descuentos?,200,OK
+60,¿Tienes TikTok?,200,OK
+61,"Tengo uñas, necesito retiro?",200,OK
+62,¿Hacen retoque de acrílico?,200,OK
+63,¿Tengo que llevar diseño para retoque?,200,OK
+64,¿Aplica si traigo uñas de otro salón?,200,OK
+65,¿Cómo pido retiro y aplicación nueva?,200,OK
+66,¿Puedo hacer solo el retoque?,200,OK
+67,¿Puedo mandar mi diseño para cotizar?,200,OK
+68,¿Manejan retoque de pestañas?,200,OK
+69,¿El retiro está incluido?,200,OK
+70,¿Hay costo por retiro?,200,OK
+71,¿Puedo agregar otro servicio?,200,OK
+72,"Ya tengo cita, quiero otro servicio también",200,OK
+73,Quiero hacer cejas y pestañas el mismo día,200,OK
+74,¿Se puede combo de cejas + labios?,200,OK
+75,¿Hacen combos de uñas + pies?,200,OK
+76,Tengo cita y quiero agregar lifting,200,OK
+77,¿Cuánto tiempo dura si hago varios servicios?,200,OK
+78,Quiero depilación y acrílico el mismo día,200,OK
+79,¿Hacen paquetes?,200,OK
+80,Agendo dos servicios juntos,200,OK
