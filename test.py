@@ -1,8 +1,8 @@
 import csv
 import requests
 import time
+import json
 
-# Endpoint of your deployed bot
 BOT_URL = "https://beauty-bot-gemini-adk.onrender.com"
 TEST_FILE = "beautybot_test_scenarios.txt"
 OUTPUT_FILE = "test_results_gemini_bot.csv"
@@ -14,16 +14,19 @@ def load_test_inputs(filepath):
 def run_test(phone, message):
     try:
         res = requests.post(BOT_URL, json={"phone": phone, "text": message}, timeout=15)
-        if res.status_code == 200:
-            return 200, res.json()  # ✅ Return parsed JSON
-        else:
-            return res.status_code, res.text.strip()
+        try:
+            parsed = res.json()
+            reply = parsed.get("response", "").replace("\n", " ")
+        except json.JSONDecodeError:
+            reply = res.text.strip()[:300].replace("\n", " ")
+
+        return res.status_code, reply
     except Exception as e:
         return "ERROR", str(e)
 
 def main():
     test_inputs = load_test_inputs(TEST_FILE)
-    phone = "19999999999"  # Dummy test phone
+    phone = "19999999999"
 
     with open(OUTPUT_FILE, mode="w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
@@ -32,15 +35,8 @@ def main():
         for i, input_text in enumerate(test_inputs, start=1):
             status, response = run_test(phone, input_text)
             print(f"[{i:03}] {status} — {input_text}")
-
-            # ✅ Pull Gemini's actual WhatsApp-style response
-            try:
-                message = response.get("response", "")[:300].replace("\n", " ")
-            except:
-                message = str(response)[:300].replace("\n", " ")
-
-            writer.writerow([i, input_text, status, message])
-            time.sleep(1.2)  # Add slight delay to avoid rate-limiting
+            writer.writerow([i, input_text, status, response])
+            time.sleep(1.2)
 
     print(f"\n✅ Done. Results saved to {OUTPUT_FILE}")
 
