@@ -1,3 +1,4 @@
 Test #,Input Message,Status Code,Gemini Response
-1,¿Dónde se encuentran?,ERROR,Expecting value: line 1 column 1 (char 0)
-2,¿Dónde están?,ERROR,Expecting value: line 1 column 1 (char 0)
+1,¿Dónde se encuentran?,200,OK
+2,¿Dónde están?,200,OK
+3,¿En qué parte están?,200,OK
