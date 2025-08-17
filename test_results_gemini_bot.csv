@@ -1,20 +1,3 @@
-Quiero agendar unas acrílicas el sábado a las 4pm.
-¿Puedo reservar lifting de cejas mañana a las 10am?
-¿Tienen espacio para BBLips el viernes a las 11?
-Quiero cita de uñas para el lunes a las 2:30
-¿Hay lugar para cejas el miércoles a las 5pm?
-¿Me puedes agendar para depilación el jueves a las 12?
-Reservo para pestañas híbridas el martes a las 9am
-¿Puedo apartar soft gel el sábado a las 3pm?
-Hola, quiero una cita de diseño de cejas para mañana 4:15
-¿Tienen disponibilidad para uñas el viernes 10:30am?
-Cita para lifting y laminado el domingo a las 12:00
-Agéndame uñas para hoy a las 5:45 porfa
-¿Se puede para depilación mañana a la 1:00pm?
-Mañana a las 9:00 quiero pestañas clásicas
-¿A qué hora tienen libre para gelish el lunes en la tarde?
-¿Me puedes agendar diseño de cejas jueves 4:30?
-Quiero cita de acripie hoy a las 6:00pm
-Cita de volumen ruso el sábado 2pm
-¿Puede ser laminado viernes a las 11:15?
-¿Hay chance para lifting lunes 3:45?
+Test #,Input Message,Status Code,Gemini Response
+1,¿Cuánto cuestan las uñas acrílicas?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+2,¿Tienen precios del lifting de cejas?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
