@@ -1,51 +1,20 @@
-Test #,Input Message,Status Code,Gemini Response
-1,¿Dónde se encuentran?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-2,¿Dónde están?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-3,¿En qué parte están?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-4,¿Cuál es su dirección?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-5,¿Me puedes dar la dirección?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-6,¿A qué dirección tengo que ir?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-7,¿Dónde está su salón?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-8,¿Dónde queda su estudio?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-9,¿Tienen ubicación en Google Maps?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-10,¿Me mandas la ubicación?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-11,¿Puedes pasarme el link de la ubicación?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-12,¿Cómo llego desde La Cima?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-13,¿Cómo llego desde Plaza Galerías?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-14,¿Cómo llego desde Periférico?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-15,¿Desde qué calle se entra?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-16,¿Tienen estacionamiento?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-17,¿Dónde puedo estacionarme?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-18,¿Cerca de qué están?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-19,¿Están por La Cima o más allá?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-20,¿Están por Zapopan o Guadalajara?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-21,¿Puedo ir caminando desde Walmart?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-22,¿Están dentro de alguna plaza?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-23,¿Me das referencias para llegar?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-24,¿Está fácil llegar?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-25,¿Puedo pedir Uber hasta allá?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-26,¿Están en Colonia Lomas?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-27,"¿Cerca del Soriana, no?",200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-28,¿Ustedes están por Antequera?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-29,¿Están en el norte o sur de Zapopan?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-30,¿Me puedes compartir la ubicación por WhatsApp?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-31,¿Están lejos del centro de Zapopan?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-32,¿Cómo llego si vengo de Tesistán?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-33,¿Tienen sucursales o solo esa?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-34,¿Están abiertos aquí en Zapopan?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-35,¿Dónde están localizados?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-36,¿En qué zona están?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-37,¿Es por San Isidro?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-38,¿Es fácil llegar en camión?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-39,¿Qué camión pasa por ahí?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-40,¿Están por el estadio?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-41,¿Es la misma dirección de siempre?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-42,¿Se cambiaron de ubicación?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-43,¿Ahí mismo por donde estaba el Oxxo?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-44,¿Me mandas pin?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-45,¿Pásame el pin por fa,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-46,¿Tienes la ubicación en maps?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-47,¿Están a pie de calle?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-48,¿Tienen letrero afuera?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-49,¿Están por la gasolinera?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-50,¿Están enfrente del Walmart?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+Quiero agendar unas acrílicas el sábado a las 4pm.
+¿Puedo reservar lifting de cejas mañana a las 10am?
+¿Tienen espacio para BBLips el viernes a las 11?
+Quiero cita de uñas para el lunes a las 2:30
+¿Hay lugar para cejas el miércoles a las 5pm?
+¿Me puedes agendar para depilación el jueves a las 12?
+Reservo para pestañas híbridas el martes a las 9am
+¿Puedo apartar soft gel el sábado a las 3pm?
+Hola, quiero una cita de diseño de cejas para mañana 4:15
+¿Tienen disponibilidad para uñas el viernes 10:30am?
+Cita para lifting y laminado el domingo a las 12:00
+Agéndame uñas para hoy a las 5:45 porfa
+¿Se puede para depilación mañana a la 1:00pm?
+Mañana a las 9:00 quiero pestañas clásicas
+¿A qué hora tienen libre para gelish el lunes en la tarde?
+¿Me puedes agendar diseño de cejas jueves 4:30?
+Quiero cita de acripie hoy a las 6:00pm
+Cita de volumen ruso el sábado 2pm
+¿Puede ser laminado viernes a las 11:15?
+¿Hay chance para lifting lunes 3:45?
