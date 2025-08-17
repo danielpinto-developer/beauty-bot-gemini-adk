@@ -1,3 +1,21 @@
 Test #,Input Message,Status Code,Gemini Response
-1,¿Cuánto cuestan las uñas acrílicas?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
-2,¿Tienen precios del lifting de cejas?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+1,Quiero cita para mañana,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+2,¿Puedo hacerme algo hoy?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+3,Uñas por la tarde,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+4,¿Tienen espacio mañana en la tarde?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+5,Me gustaría ir el viernes,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+6,¿Podría ir a las 5pm?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+7,Estoy libre esta semana,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+8,¿Puedo ir hoy en la mañana?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+9,¿Tienen disponibilidad hoy para unas acrílicas a las 2pm?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+10,Quiero agendar pero no sé la hora,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+11,¿Tienen cita mañana?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+12,¿A qué hora tienen hoy?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+13,Quiero cita para el sábado a las 12pm para BBLips,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+14,¿Hay lugar el lunes en la noche?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+15,Lifting de pestañas por la mañana,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+16,¿Puedo ir el martes a las 4pm para unas uñas acrílicas?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+17,Tengo chance mañana,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+18,¿Me puedes agendar depilación cejas el viernes a las 10am?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+19,Algo para hoy por la tarde,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
+20,¿Me apartas algo esta semana?,200,JSON ERROR: Expecting value: line 1 column 1 (char 0) - Raw: OK
