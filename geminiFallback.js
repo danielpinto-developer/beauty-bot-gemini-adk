@@ -163,14 +163,12 @@ async function getGeminiReply(userText) {
     let headers = { "Content-Type": "application/json" };
 
     if (hasTuned) {
-      apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/${process.env.TUNED_MODEL_NAME}:generateContent`;
-      const auth = new GoogleAuth({
-        scopes: ["https://www.googleapis.com/auth/cloud-platform"],
-      });
+      const tunedNameNoVersion = String(process.env.TUNED_MODEL_NAME).split("@")[0];
+      apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/${tunedNameNoVersion}:generateContent`;
+      const auth = new GoogleAuth({ scopes: ["https://www.googleapis.com/auth/cloud-platform"] });
       const client = await auth.getClient();
       const accessToken = await client.getAccessToken();
-      const token =
-        typeof accessToken === "string" ? accessToken : accessToken.token;
+      const token = typeof accessToken === "string" ? accessToken : accessToken.token;
       headers = { ...headers, Authorization: `Bearer ${token}` };
     } else {
       apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${process.env.GEMINI_API_KEY}`;
