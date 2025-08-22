@@ -1,0 +1,103 @@
+{
+  "tunedModelName": "projects/beauty-blossoms-629c9/locations/us-central1/tunedModels/beautybot-gemini-tuned-1755833736935",
+  "displayName": "beautybot-gemini-tuned-1755833736935",
+  "baseModel": "gemini-2.5-flash",
+  "state": "PENDING",
+  "createTime": "2025-08-22T03:35:37.327Z",
+  "updateTime": "2025-08-22T03:35:37.328Z",
+  "trainingExamplesCount": 20,
+  "submittedAt": "2025-08-22T03:35:37.328Z",
+  "timestamp": 1755833736935,
+  "apiUsed": "Vertex AI (structured for future implementation)",
+  "vertexAIConfig": {
+    "projectId": "beauty-blossoms-629c9",
+    "location": "us-central1",
+    "bucket": "beautybot-finetune-data",
+    "baseModel": "gemini-2.5-flash",
+    "trainingData": [
+      {
+        "textInput": "Hola quiero hacer una cita",
+        "output": "¡Hola hermosa! 💖 ¿Te gustaría agendar unas uñas pestañas o cejas?"
+      },
+      {
+        "textInput": "¿Cuánto cuestan las uñas acrílicas?",
+        "output": "El precio de *uñas acrílicas* es de Desde $250 MXN 💵"
+      },
+      {
+        "textInput": "¿Dónde están ubicados?",
+        "output": "📍 Ubicación: Beauty Blossoms (https://maps.app.goo.gl/CtavKUYUV3zyvaLU6)"
+      },
+      {
+        "textInput": "Buenas tardes, necesito una cita",
+        "output": "¡Hola hermosa! 💖 ¿Te gustaría agendar unas uñas pestañas o cejas?"
+      },
+      {
+        "textInput": "Hola, quiero información sobre precios",
+        "output": "¡Hola hermosa! 💖 ¿Te gustaría agendar unas uñas pestañas o cejas?"
+      },
+      {
+        "textInput": "¿Cuánto cuesta manicure spa?",
+        "output": "El precio de *manicure spa* es de $250 MXN 💵"
+      },
+      {
+        "textInput": "¿Cuánto cuestan las pestañas clásicas?",
+        "output": "El precio de *pestañas clásicas* es de $400 MXN 💵"
+      },
+      {
+        "textInput": "¿Cuánto cuesta lifting de pestañas?",
+        "output": "El precio de *lifting de pestañas* es de $350 MXN 💵"
+      },
+      {
+        "textInput": "¿Cuánto cuestan las uñas soft gel?",
+        "output": "El precio de *uñas soft gel* es de $350 MXN 💵"
+      },
+      {
+        "textInput": "¿Dónde queda el salón?",
+        "output": "📍 Ubicación: Beauty Blossoms (https://maps.app.goo.gl/CtavKUYUV3zyvaLU6)"
+      },
+      {
+        "textInput": "¿Cuál es la dirección?",
+        "output": "📍 Ubicación: Beauty Blossoms (https://maps.app.goo.gl/CtavKUYUV3zyvaLU6)"
+      },
+      {
+        "textInput": "Gracias por la información",
+        "output": "¡Con gusto hermosa! 💖 Estamos aquí para ti en Beauty Blossoms 🌸"
+      },
+      {
+        "textInput": "Muchas gracias",
+        "output": "¡Con gusto hermosa! 💖 Estamos aquí para ti en Beauty Blossoms 🌸"
+      },
+      {
+        "textInput": "Adiós",
+        "output": "¡Con gusto hermosa! 💖 Estamos aquí para ti en Beauty Blossoms 🌸"
+      },
+      {
+        "textInput": "Chao",
+        "output": "¡Con gusto hermosa! 💖 Estamos aquí para ti en Beauty Blossoms 🌸"
+      },
+      {
+        "textInput": "¿Qué servicios ofrecen?",
+        "output": "¡Hola hermosa! 💖 ¿Te gustaría agendar unas uñas pestañas o cejas?"
+      },
+      {
+        "textInput": "¿Tienen servicio de pestañas?",
+        "output": "¡Claro que sí! Las pestañas clásicas tienen un costo de $400 MXN 💅 ¿Te gustaría agendar una cita?"
+      },
+      {
+        "textInput": "¿Hacen uñas?",
+        "output": "¡Claro que sí! Las uñas acrílicas tienen un costo desde $250 MXN 💅 ¿Te gustaría agendar una cita?"
+      },
+      {
+        "textInput": "¿Tienen tratamientos faciales?",
+        "output": "¡Claro que sí! El BBLips tiene un costo de $500 MXN 💅 ¿Te gustaría agendar una cita?"
+      },
+      {
+        "textInput": "¿Cuánto cuesta el BBLips?",
+        "output": "El precio de *bblips* es de $500 MXN 💵"
+      }
+    ],
+    "jobName": "beautybot-job-1755833736935"
+  },
+  "error": "Request failed with status code 400",
+  "note": "This shows the correct Vertex AI structure. Update when API supports supervised fine-tuning."
+}

@@ -1,4 +1,4 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const axios = require("axios");
 
 console.log("📦 Loading Gemini module...");
 
@@ -7,19 +7,22 @@ if (!process.env.GEMINI_API_KEY) {
   throw new Error("Missing GEMINI_API_KEY");
 }
 
-// Support for tuned models via environment variable
-const BASE_MODEL = process.env.GEMINI_BASE_MODEL || "models/gemini-1.5-pro";
-const TUNED_MODEL_NAME = process.env.TUNED_MODEL_NAME;
-
-const modelName = TUNED_MODEL_NAME || BASE_MODEL;
-console.log(`🎯 Using Gemini model: ${modelName}`);
-console.log(`📊 Base model: ${BASE_MODEL}`);
-if (TUNED_MODEL_NAME) {
-  console.log(`🎵 Tuned model: ${TUNED_MODEL_NAME}`);
+if (!process.env.GEMINI_BASE_MODEL) {
+  console.error("❌ GEMINI_BASE_MODEL is missing from .env");
+  throw new Error("Missing GEMINI_BASE_MODEL");
 }
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: modelName });
+// Support tuned model preference
+const usingTuned = !!process.env.TUNED_MODEL_NAME;
+const modelName = usingTuned
+  ? process.env.TUNED_MODEL_NAME
+  : `models/${process.env.GEMINI_BASE_MODEL}`;
+
+if (usingTuned) {
+  console.log(`⚡ Using tuned model: ${process.env.TUNED_MODEL_NAME}`);
+} else {
+  console.log(`⚡ Using base model: ${process.env.GEMINI_BASE_MODEL}`);
+}
 
 console.log(`✅ Gemini model initialized: ${modelName}`);
 
@@ -155,22 +158,40 @@ async function getGeminiReply(userText) {
   console.log("🧠 getGeminiReply called with input:", userText);
 
   try {
-    const chat = await model.startChat({
-      history: [
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+
+    const requestBody = {
+      contents: [
         {
-          role: "user",
-          parts: [{ text: systemPrompt }],
+          parts: [
+            {
+              text: systemPrompt,
+            },
+          ],
+        },
+        {
+          parts: [
+            {
+              text: userText,
+            },
+          ],
         },
       ],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 1024,
+      },
+    };
+
+    console.log("📨 Sending request to Gemini API");
+    const response = await axios.post(apiUrl, requestBody, {
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
-    console.log("💬 Chat session started successfully");
-    console.log("📨 Sending user message to Gemini:", userText);
-
-    const result = await chat.sendMessage(userText);
-
     console.log("✅ Gemini responded");
-    const raw = result.response.text().trim();
+    const raw = response.data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     console.log("📄 Raw Gemini response:\n", raw);
 
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
@@ -198,6 +219,13 @@ async function getGeminiReply(userText) {
     };
   } catch (err) {
     console.error("❌ Gemini fallback error:", err.message || err);
+    if (err.response) {
+      console.error("📄 Response status:", err.response.status);
+      console.error(
+        "📄 Response data:",
+        JSON.stringify(err.response.data, null, 2)
+      );
+    }
     return {
       intent: "fallback",
       slots: {

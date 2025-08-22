@@ -4,7 +4,13 @@
   "description": "Production WhatsApp chatbot for Beauty Blossoms powered by Gemini",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "ft:prepare": "node tools/ft_prepare.js",
+    "ft:submit": "node tools/ft_submit.js",
+    "ft:eval": "node tools/eval_from_jsonl.js",
+    "test:nlg": "node tools/test_nlg.js",
+    "ft:split": "node tools/split_dataset.js",
+    "ft:convert": "node tools/convert_split.js"
   },
   "keywords": [
     "whatsapp",
@@ -16,10 +22,12 @@
   "author": "Daniel Pinto",
   "license": "MIT",
   "dependencies": {
-    "@google/generative-ai": "^0.5.0",
+    "@google-cloud/aiplatform": "^3.23.0",
+    "@google-cloud/storage": "^7.7.0",
     "axios": "^1.11.0",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
-    "firebase-admin": "^13.4.0"
+    "firebase-admin": "^13.4.0",
+    "google-auth-library": "^9.14.1"
   }
 }
