@@ -3,27 +3,25 @@ const { GoogleAuth } = require("google-auth-library");
 
 console.log("📦 Loading Gemini module...");
 
-const hasTuned = !!process.env.TUNED_MODEL_NAME;
+// ENVIRONMENT / MODEL SELECTION
+const tunedEndpoint = process.env.TUNED_MODEL_ENDPOINT || "";
+const hasTunedEndpoint = Boolean(tunedEndpoint);
 
-if (hasTuned) {
+if (hasTunedEndpoint) {
   if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     console.error("❌ GOOGLE_APPLICATION_CREDENTIALS is missing from env");
     throw new Error("Missing GOOGLE_APPLICATION_CREDENTIALS");
   }
-  console.log(`⚡ Using tuned model: ${process.env.TUNED_MODEL_NAME}`);
-} else if (process.env.GEMINI_API_KEY && process.env.GEMINI_BASE_MODEL) {
+  console.log(`⚡ Using tuned model endpoint: ${tunedEndpoint}`);
+} else if (process.env.GEMINI_BASE_MODEL) {
+  if (!process.env.GEMINI_API_KEY) {
+    console.error("❌ GEMINI_API_KEY is missing from .env");
+    throw new Error("Missing GEMINI_API_KEY");
+  }
   console.log(`⚡ Using base model: ${process.env.GEMINI_BASE_MODEL}`);
 } else {
   throw new Error("No model configured");
 }
-
-// Build modelName, stripping any '@version' suffix when using tuned model
-const rawName = process.env.TUNED_MODEL_NAME;
-const modelName = hasTuned
-  ? String(rawName || "").replace(/@.*/, "")
-  : `models/${process.env.GEMINI_BASE_MODEL}`;
-
-console.log(`✅ Gemini model initialized: ${modelName}`);
 
 const validServicios = [
   // 💅 NAIL BAR
@@ -142,9 +140,9 @@ Responde en este formato JSON **exacto**:
 {
   "intent": "book_appointment" | "greeting" | "gratitude" | "faq_price" | "faq_location" | "fallback",
   "slots": {
-    "servicio": "string or null",
-    "fecha": "string or null",
-    "hora": "string or null"
+    "servicio": "string o null",
+    "fecha": "string o null",
+    "hora": "string o null"
   },
   "response": "respuesta cálida para WhatsApp"
 }
@@ -159,56 +157,71 @@ async function getGeminiReply(userText) {
   try {
     let apiUrl;
     let headers = { "Content-Type": "application/json" };
+    let requestBody;
 
-    if (hasTuned) {
-      apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/${modelName}:generateContent`;
+    if (hasTunedEndpoint) {
+      // Tuned model path via Vertex AI Predict
+      apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/${tunedEndpoint}:predict`;
+      console.log("🔧 Mode: tuned endpoint");
+      console.log("🔗 apiUrl:", apiUrl);
       const auth = new GoogleAuth({ scopes: ["https://www.googleapis.com/auth/cloud-platform"] });
       const client = await auth.getClient();
       const accessToken = await client.getAccessToken();
       const token = typeof accessToken === "string" ? accessToken : accessToken.token;
       headers = { ...headers, Authorization: `Bearer ${token}` };
+
+      requestBody = {
+        instances: [
+          {
+            content: {
+              role: "user",
+              parts: [{ text: userText }],
+            },
+          },
+        ],
+        parameters: {
+          temperature: 0.7,
+          maxOutputTokens: 512,
+        },
+      };
     } else {
-      if (!process.env.GEMINI_API_KEY) {
-        throw new Error("Missing GEMINI_API_KEY");
-      }
-      apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+      // Base model path via Generative Language API
+      apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${process.env.GEMINI_BASE_MODEL}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+      console.log("🔧 Mode: base model");
+      console.log("🔗 apiUrl:", apiUrl);
+
+      requestBody = {
+        contents: [
+          { parts: [{ text: systemPrompt }] },
+          { parts: [{ text: userText }] },
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 1024,
+        },
+      };
     }
 
-    const requestBody = {
-      contents: [
-        {
-          parts: [
-            {
-              text: systemPrompt,
-            },
-          ],
-        },
-        {
-          parts: [
-            {
-              text: userText,
-            },
-          ],
-        },
-      ],
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 1024,
-      },
-    };
-
-    console.log("📨 Sending request to Gemini API");
+    console.log("📨 Sending request to API");
     const response = await axios.post(apiUrl, requestBody, { headers });
 
-    console.log("✅ Gemini responded");
-    const raw = response.data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    console.log("📄 Raw Gemini response:\n", raw);
+    // RESPONSE HANDLING
+    let rawText = "";
+    if (hasTunedEndpoint) {
+      console.log("📄 Full raw response:", JSON.stringify(response.data, null, 2));
+      rawText = response.data?.predictions?.[0]?.content?.parts?.[0]?.text || "";
+    } else {
+      console.log("📄 Full raw response:", JSON.stringify(response.data, null, 2));
+      rawText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    }
+    console.log("📝 Extracted text:", rawText);
 
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    // Try to extract JSON block
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("No valid JSON block found");
 
     const jsonText = jsonMatch[0];
-    console.log("🧾 Extracted JSON snippet:\n", jsonText);
+    console.log("🧾 JSON snippet:", jsonText);
 
     const parsed = JSON.parse(jsonText);
     console.log("✅ Parsed JSON response:", parsed);
@@ -230,10 +243,7 @@ async function getGeminiReply(userText) {
     console.error("❌ Gemini fallback error:", err.message || err);
     if (err.response) {
       console.error("📄 Response status:", err.response.status);
-      console.error(
-        "📄 Response data:",
-        JSON.stringify(err.response.data, null, 2)
-      );
+      console.error("📄 Response data:", JSON.stringify(err.response.data, null, 2));
     }
     return {
       intent: "fallback",
