@@ -3,25 +3,17 @@ const { GoogleAuth } = require("google-auth-library");
 
 console.log("📦 Loading Gemini module...");
 
-// ENVIRONMENT / MODEL SELECTION
-const tunedEndpoint = process.env.TUNED_MODEL_ENDPOINT || "";
-const hasTunedEndpoint = Boolean(tunedEndpoint);
-
-if (hasTunedEndpoint) {
-  if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-    console.error("❌ GOOGLE_APPLICATION_CREDENTIALS is missing from env");
-    throw new Error("Missing GOOGLE_APPLICATION_CREDENTIALS");
-  }
-  console.log(`⚡ Using tuned model endpoint: ${tunedEndpoint}`);
-} else if (process.env.GEMINI_BASE_MODEL) {
-  if (!process.env.GEMINI_API_KEY) {
-    console.error("❌ GEMINI_API_KEY is missing from .env");
-    throw new Error("Missing GEMINI_API_KEY");
-  }
-  console.log(`⚡ Using base model: ${process.env.GEMINI_BASE_MODEL}`);
-} else {
-  throw new Error("No model configured");
+// Force tuned endpoint usage
+if (!process.env.TUNED_MODEL_ENDPOINT) {
+  console.error("❌ TUNED_MODEL_ENDPOINT is missing from env");
+  throw new Error("Missing TUNED_MODEL_ENDPOINT");
 }
+if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  console.error("❌ GOOGLE_APPLICATION_CREDENTIALS is missing from env");
+  throw new Error("Missing GOOGLE_APPLICATION_CREDENTIALS");
+}
+
+console.log(`⚡ Using tuned model endpoint: ${process.env.TUNED_MODEL_ENDPOINT}`);
 
 const validServicios = [
   // 💅 NAIL BAR
@@ -126,131 +118,52 @@ function validateServicioKey(key) {
 
 const systemPrompt = `
 Eres BeautyBot, la asistente profesional y cálida de Beauty Blossoms Studio, un salón de belleza en Zapopan, Jalisco.
-
-Tu única tarea es:
-1. Detectar la intención del usuario
-2. Extraer los siguientes datos si están presentes:
-   - servicio (uñas, pestañas, etc.)
-   - fecha (hoy, mañana, martes, 10 de agosto, etc.)
-   - hora (10am, 2:30pm, etc.)
-3. Responder en español, en máximo 3 oraciones, con calidez profesional.
-
-Responde en este formato JSON **exacto**:
-
-{
-  "intent": "book_appointment" | "greeting" | "gratitude" | "faq_price" | "faq_location" | "fallback",
-  "slots": {
-    "servicio": "string o null",
-    "fecha": "string o null",
-    "hora": "string o null"
-  },
-  "response": "respuesta cálida para WhatsApp"
-}
-
-IMPORTANTE: el campo "servicio" debe coincidir exactamente con uno de los siguientes:
-${validServicios.join(", ")}
 `;
 
 async function getGeminiReply(userText) {
   console.log("🧠 getGeminiReply called with input:", userText);
 
   try {
-    let apiUrl;
-    let headers = { "Content-Type": "application/json" };
-    let requestBody;
+    const apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/${process.env.TUNED_MODEL_ENDPOINT}:predict`;
+    console.log("🔧 Mode: tuned endpoint only");
+    console.log("🔗 apiUrl:", apiUrl);
 
-    if (hasTunedEndpoint) {
-      // Tuned model path via Vertex AI Predict
-      apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/${tunedEndpoint}:predict`;
-      console.log("🔧 Mode: tuned endpoint");
-      console.log("🔗 apiUrl:", apiUrl);
-      const auth = new GoogleAuth({
-        scopes: ["https://www.googleapis.com/auth/cloud-platform"],
-      });
-      const client = await auth.getClient();
-      const accessToken = await client.getAccessToken();
-      const token =
-        typeof accessToken === "string" ? accessToken : accessToken.token;
-      headers = { ...headers, Authorization: `Bearer ${token}` };
+    const auth = new GoogleAuth({ scopes: ["https://www.googleapis.com/auth/cloud-platform"] });
+    const client = await auth.getClient();
+    const accessToken = await client.getAccessToken();
+    const token = typeof accessToken === "string" ? accessToken : accessToken.token;
 
-      requestBody = {
-        instances: [
-          {
-            content: {
-              role: "user",
-              parts: [{ text: userText }],
-            },
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+
+    const requestBody = {
+      instances: [
+        {
+          content: {
+            role: "user",
+            parts: [{ text: userText }],
           },
-        ],
-        parameters: {
-          temperature: 0.7,
-          maxOutputTokens: 512,
         },
-      };
-    } else {
-      // Base model path via Generative Language API
-      apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${process.env.GEMINI_BASE_MODEL}:generateContent?key=${process.env.GEMINI_API_KEY}`;
-      console.log("🔧 Mode: base model");
-      console.log("🔗 apiUrl:", apiUrl);
+      ],
+      parameters: {
+        temperature: 0.7,
+        maxOutputTokens: 512,
+      },
+    };
 
-      requestBody = {
-        contents: [
-          { parts: [{ text: systemPrompt }] },
-          { parts: [{ text: userText }] },
-        ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 1024,
-        },
-      };
-    }
-
-    console.log("📨 Sending request to API");
+    console.log("📨 Sending request to Vertex AI Predict");
     const response = await axios.post(apiUrl, requestBody, { headers });
 
-    // RESPONSE HANDLING
-    let rawText = "";
-    if (hasTunedEndpoint) {
-      console.log(
-        "📄 Full raw response:",
-        JSON.stringify(response.data, null, 2)
-      );
-      rawText =
-        response.data?.predictions?.[0]?.content?.parts?.[0]?.text || "";
-    } else {
-      console.log(
-        "📄 Full raw response:",
-        JSON.stringify(response.data, null, 2)
-      );
-      rawText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    }
-    console.log("📝 Extracted text:", rawText);
+    console.log("📄 Full raw response:", JSON.stringify(response.data, null, 2));
+    const text =
+      response.data?.predictions?.[0]?.content?.[0]?.parts?.[0]?.text || "";
 
-    // Try to extract JSON block
-    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No valid JSON block found");
-
-    const jsonText = jsonMatch[0];
-    console.log("🧾 JSON snippet:", jsonText);
-
-    const parsed = JSON.parse(jsonText);
-    console.log("✅ Parsed JSON response:", parsed);
-
-    const cleanedServicio = validateServicioKey(parsed.slots?.servicio);
-
-    return {
-      intent: parsed.intent || "fallback",
-      slots: {
-        servicio: cleanedServicio,
-        fecha: parsed.slots?.fecha || null,
-        hora: parsed.slots?.hora || null,
-      },
-      response:
-        parsed.response ||
-        "Lo siento, no entendí muy bien eso 🤖 ¿Podrías decírmelo de otra forma?",
-    };
+    console.log("📝 Extracted text:", text);
+    return text || "Lo siento, no entendí muy bien eso 🤖 ¿Podrías decírmelo de otra forma?";
   } catch (err) {
-    console.error("❌ Gemini fallback error:", err.message || err);
+    console.error("❌ Gemini tuned endpoint error:", err.message || err);
     if (err.response) {
       console.error("📄 Response status:", err.response.status);
       console.error(
@@ -258,16 +171,7 @@ async function getGeminiReply(userText) {
         JSON.stringify(err.response.data, null, 2)
       );
     }
-    return {
-      intent: "fallback",
-      slots: {
-        servicio: null,
-        fecha: null,
-        hora: null,
-      },
-      response:
-        "Lo siento, no entendí muy bien eso 🤖 ¿Podrías decírmelo de otra forma?",
-    };
+    return "Lo siento, no entendí muy bien eso 🤖 ¿Podrías decírmelo de otra forma?";
   }
 }
 
