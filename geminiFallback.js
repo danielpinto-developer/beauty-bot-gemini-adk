@@ -159,16 +159,17 @@ async function getGeminiReply(userText) {
       console.log("🔧 Mode: tuned model");
       console.log("🔗 apiUrl:", apiUrl);
 
-      const auth = new GoogleAuth({ scopes: ["https://www.googleapis.com/auth/cloud-platform"] });
+      const auth = new GoogleAuth({
+        scopes: ["https://www.googleapis.com/auth/cloud-platform"],
+      });
       const client = await auth.getClient();
       const accessToken = await client.getAccessToken();
-      const token = typeof accessToken === "string" ? accessToken : accessToken.token;
+      const token =
+        typeof accessToken === "string" ? accessToken : accessToken.token;
       headers = { ...headers, Authorization: `Bearer ${token}` };
 
       requestBody = {
-        contents: [
-          { role: "user", parts: [{ text: userText }] },
-        ],
+        contents: [{ role: "user", parts: [{ text: userText }] }],
         generationConfig: {
           temperature: 0.7,
           maxOutputTokens: 512,
@@ -194,8 +195,12 @@ async function getGeminiReply(userText) {
     console.log("📨 Sending request to API");
     const response = await axios.post(apiUrl, requestBody, { headers });
 
-    console.log("📄 Full raw response:", JSON.stringify(response.data, null, 2));
-    const rawText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    console.log(
+      "📄 Full raw response:",
+      JSON.stringify(response.data, null, 2)
+    );
+    const rawText =
+      response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
     console.log("📝 Raw Gemini text:", rawText);
 
     // Try to extract JSON block
@@ -225,12 +230,16 @@ async function getGeminiReply(userText) {
     console.error("❌ Gemini reply error:", err.message || err);
     if (err.response) {
       console.error("📄 Response status:", err.response.status);
-      console.error("📄 Response data:", JSON.stringify(err.response.data, null, 2));
+      console.error(
+        "📄 Response data:",
+        JSON.stringify(err.response.data, null, 2)
+      );
     }
     return {
       intent: "fallback",
       slots: { servicio: null, fecha: null, hora: null },
-      response: "Lo siento, no entendí muy bien eso 🤖 ¿Podrías decírmelo de otra forma?",
+      response:
+        "Lo siento, no entendí muy bien eso 🤖 ¿Podrías decírmelo de otra forma?",
     };
   }
 }

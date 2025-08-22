@@ -200,7 +200,9 @@ async function messageDispatcher({ phone, text }) {
 
     await notifyMoni(
       phone,
-      `Cita solicitada: ${fechaFormatted || "?"} ${hora || "?"} (${servicio || "?"})`
+      `Cita solicitada: ${fechaFormatted || "?"} ${hora || "?"} (${
+        servicio || "?"
+      })`
     );
   }
 
