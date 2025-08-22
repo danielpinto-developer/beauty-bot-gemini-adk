@@ -24,7 +24,7 @@ if (hasTuned) {
 // Build modelName, stripping any '@version' suffix when using tuned model
 const rawName = process.env.TUNED_MODEL_NAME;
 const modelName = hasTuned
-  ? String(rawName || "").split("@")[0]
+  ? rawName.replace(/@.*/, "") // strip any @version
   : `models/${process.env.GEMINI_BASE_MODEL}`;
 
 console.log(`✅ Gemini model initialized: ${modelName}`);
@@ -167,10 +167,13 @@ async function getGeminiReply(userText) {
     if (hasTuned) {
       const tunedNameNoVersion = modelName; // modelName already stripped
       apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/${tunedNameNoVersion}:generateContent`;
-      const auth = new GoogleAuth({ scopes: ["https://www.googleapis.com/auth/cloud-platform"] });
+      const auth = new GoogleAuth({
+        scopes: ["https://www.googleapis.com/auth/cloud-platform"],
+      });
       const client = await auth.getClient();
       const accessToken = await client.getAccessToken();
-      const token = typeof accessToken === "string" ? accessToken : accessToken.token;
+      const token =
+        typeof accessToken === "string" ? accessToken : accessToken.token;
       headers = { ...headers, Authorization: `Bearer ${token}` };
     } else {
       apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${process.env.GEMINI_API_KEY}`;
