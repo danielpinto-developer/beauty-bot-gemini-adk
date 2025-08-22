@@ -4,9 +4,9 @@ const { GoogleAuth } = require("google-auth-library");
 console.log("📦 Loading Gemini module...");
 
 // Keep support for tuned and base models
-const hasTunedName = !!process.env.TUNED_MODEL_NAME;
+const hasTUNED = !!process.env.TUNED_MODEL_NAME;
 
-if (hasTunedName) {
+if (hasTUNED) {
   if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     console.error("❌ GOOGLE_APPLICATION_CREDENTIALS is missing from env");
     throw new Error("Missing GOOGLE_APPLICATION_CREDENTIALS");
@@ -154,35 +154,40 @@ async function getGeminiReply(userText) {
     let headers = { "Content-Type": "application/json" };
     let requestBody;
 
-    if (hasTunedName) {
-      apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/${process.env.TUNED_MODEL_NAME.replace(
-        /@.*/,
-        ""
-      )}:generateContent`;
-      console.log("🔧 Mode: tuned model");
+    if (hasTUNED) {
+      apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/${process.env.TUNED_MODEL_NAME}:generateContent`;
+      console.log("🔧 Mode: tuned model (Vertex)");
       console.log("🔗 apiUrl:", apiUrl);
 
-      const auth = new GoogleAuth({
-        scopes: ["https://www.googleapis.com/auth/cloud-platform"],
-      });
+      console.log("🔑 Retrieving GoogleAuth token...");
+      const auth = new GoogleAuth({ scopes: ["https://www.googleapis.com/auth/cloud-platform"] });
       const client = await auth.getClient();
       const accessToken = await client.getAccessToken();
-      const token =
-        typeof accessToken === "string" ? accessToken : accessToken.token;
+      const token = typeof accessToken === "string" ? accessToken : accessToken.token;
       headers = { ...headers, Authorization: `Bearer ${token}` };
+      console.log("✅ Token acquired, headers set.");
 
+      // Vertex tuned messages schema
       requestBody = {
-        contents: [{ role: "user", parts: [{ text: userText }] }],
-        generationConfig: {
+        instances: [
+          {
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userText },
+            ],
+          },
+        ],
+        parameters: {
           temperature: 0.7,
-          maxOutputTokens: 512,
+          maxOutputTokens: 1024,
         },
       };
     } else {
       apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${process.env.GEMINI_BASE_MODEL}:generateContent?key=${process.env.GEMINI_API_KEY}`;
-      console.log("🔧 Mode: base model");
+      console.log("🔧 Mode: base model (API key)");
       console.log("🔗 apiUrl:", apiUrl);
 
+      // Keep base model body (contents schema)
       requestBody = {
         contents: [
           { parts: [{ text: systemPrompt }] },
@@ -195,30 +200,47 @@ async function getGeminiReply(userText) {
       };
     }
 
-    console.log("📨 Sending request to API");
+    console.log("🧾 Request body:", JSON.stringify(requestBody, null, 2));
+    console.log("📨 Sending request to API...");
     const response = await axios.post(apiUrl, requestBody, { headers });
 
-    console.log(
-      "📄 Full raw response:",
-      JSON.stringify(response.data, null, 2)
-    );
-    const rawText =
-      response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    console.log("📄 Full raw response:", JSON.stringify(response.data, null, 2));
+
+    let rawText = "";
+    if (hasTUNED) {
+      // Many tuned endpoints still return candidates with content/parts when using generateContent.
+      rawText =
+        response.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+        response.data?.predictions?.[0]?.content?.[0]?.parts?.[0]?.text ||
+        "";
+    } else {
+      rawText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    }
+
     console.log("📝 Raw Gemini text:", rawText);
 
     // Try to extract JSON block
     const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No valid JSON block found");
+    if (!jsonMatch) {
+      console.error("⚠️ No JSON block found in response text");
+      return {
+        intent: "fallback",
+        slots: { servicio: null, fecha: null, hora: null },
+        response: rawText || "Lo siento, no entendí muy bien eso 🤖 ¿Podrías decírmelo de otra forma?",
+      };
+    }
 
     const jsonText = jsonMatch[0];
     console.log("🧾 JSON snippet:", jsonText);
 
+    console.log("🔎 Parsing JSON...");
     const parsed = JSON.parse(jsonText);
-    console.log("✅ Parsed JSON response:", parsed);
+    console.log("✅ Parsed JSON:", parsed);
 
+    console.log("🧹 Cleaning servicio slot...");
     const cleanedServicio = validateServicioKey(parsed.slots?.servicio);
 
-    return {
+    const result = {
       intent: parsed.intent || "fallback",
       slots: {
         servicio: cleanedServicio,
@@ -229,21 +251,22 @@ async function getGeminiReply(userText) {
         parsed.response ||
         "Lo siento, no entendí muy bien eso 🤖 ¿Podrías decírmelo de otra forma?",
     };
+
+    console.log("📦 getGeminiReply returning:", JSON.stringify(result));
+    return result;
   } catch (err) {
     console.error("❌ Gemini reply error:", err.message || err);
     if (err.response) {
       console.error("📄 Response status:", err.response.status);
-      console.error(
-        "📄 Response data:",
-        JSON.stringify(err.response.data, null, 2)
-      );
+      console.error("📄 Response data:", JSON.stringify(err.response.data, null, 2));
     }
-    return {
+    const fallback = {
       intent: "fallback",
       slots: { servicio: null, fecha: null, hora: null },
-      response:
-        "Lo siento, no entendí muy bien eso 🤖 ¿Podrías decírmelo de otra forma?",
+      response: "Lo siento, no entendí muy bien eso 🤖 ¿Podrías decírmelo de otra forma?",
     };
+    console.log("📦 getGeminiReply returning (fallback):", JSON.stringify(fallback));
+    return fallback;
   }
 }
 
