@@ -7,6 +7,31 @@ const { messageDispatcher } = require("./messageDispatcher");
 const { handleUnsupportedMedia } = require("./mediaHandler");
 const { admin, db } = require("./firebase");
 
+// Startup logging (redact secrets)
+(function startupLogs() {
+  const redactedEnv = {
+    NODE_ENV: process.env.NODE_ENV || "",
+    PORT: process.env.PORT || "",
+    GCP_PROJECT_ID: process.env.GCP_PROJECT_ID || "",
+    GCP_LOCATION: process.env.GCP_LOCATION || "",
+    TUNED_MODEL_NAME: process.env.TUNED_MODEL_NAME || "",
+    GEMINI_BASE_MODEL: process.env.GEMINI_BASE_MODEL || "",
+    GOOGLE_APPLICATION_CREDENTIALS: process.env.GOOGLE_APPLICATION_CREDENTIALS || "",
+  };
+  console.log("🔧 Environment (redacted):", redactedEnv);
+
+  const hasTuned = !!process.env.TUNED_MODEL_NAME;
+  const hasBase = !!(process.env.GEMINI_BASE_MODEL && process.env.GEMINI_API_KEY);
+  console.log("🧭 Model mode:", hasTuned ? "tuned" : hasBase ? "base" : "none");
+
+  if (hasTuned && (!process.env.GCP_PROJECT_ID || !process.env.GCP_LOCATION)) {
+    throw new Error("models/undefined: GCP project/location missing for tuned mode");
+  }
+  if (!hasTuned && !hasBase) {
+    throw new Error("No model configured (neither tuned nor base)");
+  }
+})();
+
 app.use(express.json());
 
 app.post("/", async (req, res) => {
@@ -94,12 +119,11 @@ app.post("/webhook", async (req, res) => {
   }
 });
 
-// ✅ Add this route for health check or root visit
+// ✅ Health check
 app.get("/", (req, res) => {
   res.send("✅ Gemini BeautyBot server is running.");
 });
 
-// ✅ This is CRUCIAL — keeps your app alive on Render
 app.listen(port, () => {
   console.log(`🚀 Server live on port ${port}`);
 });
