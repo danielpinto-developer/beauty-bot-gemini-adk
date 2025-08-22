@@ -1,0 +1,20 @@
+{"input":"Hola quiero hacer una cita","expected":"¡Hola hermosa! 💖 ¿Te gustaría agendar unas uñas pestañas o cejas?","actual":"¡Hola hermosa! 💖 ¿Te gustaría agendar unas uñas pestañas o cejas?"}
+{"input":"¿Cuánto cuestan las uñas acrílicas?","expected":"El precio de *uñas acrílicas* es de Desde $250 MXN 💵","actual":"El precio de *uñas acrílicas* es de Desde $250 MXN 💵"}
+{"input":"¿Dónde están ubicados?","expected":"📍 Ubicación: Beauty Blossoms (https://maps.app.goo.gl/CtavKUYUV3zyvaLU6)","actual":"📍 Ubicación: Beauty Blossoms (https://maps.app.goo.gl/CtavKUYUV3zyvaLU6)"}
+{"input":"Buenas tardes, necesito una cita","expected":"¡Hola hermosa! 💖 ¿Te gustaría agendar unas uñas pestañas o cejas?","actual":"¡Hola hermosa! 💖 ¿Te gustaría agendar unas uñas pestañas o cejas?"}
+{"input":"Hola, quiero información sobre precios","expected":"¡Hola hermosa! 💖 ¿Te gustaría agendar unas uñas pestañas o cejas?","actual":"¡Hola hermosa! 💖 ¿Te gustaría agendar unas uñas pestañas o cejas?"}
+{"input":"¿Cuánto cuesta manicure spa?","expected":"El precio de *manicure spa* es de $250 MXN 💵","actual":"El precio de *manicure spa* es de $250 MXN 💵"}
+{"input":"¿Cuánto cuestan las pestañas clásicas?","expected":"El precio de *pestañas clásicas* es de $400 MXN 💵","actual":"El precio de *pestañas clásicas* es de $400 MXN 💵"}
+{"input":"¿Cuánto cuesta lifting de pestañas?","expected":"El precio de *lifting de pestañas* es de $350 MXN 💵","actual":"El precio de *lifting de pestañas* es de $350 MXN 💵"}
+{"input":"¿Cuánto cuestan las uñas soft gel?","expected":"El precio de *uñas soft gel* es de $350 MXN 💵","actual":"El precio de *uñas soft gel* es de $350 MXN 💵"}
+{"input":"¿Dónde queda el salón?","expected":"📍 Ubicación: Beauty Blossoms (https://maps.app.goo.gl/CtavKUYUV3zyvaLU6)","actual":"📍 Ubicación: Beauty Blossoms (https://maps.app.goo.gl/CtavKUYUV3zyvaLU6)"}
+{"input":"¿Cuál es la dirección?","expected":"📍 Ubicación: Beauty Blossoms (https://maps.app.goo.gl/CtavKUYUV3zyvaLU6)","actual":"📍 Ubicación: Beauty Blossoms (https://maps.app.goo.gl/CtavKUYUV3zyvaLU6)"}
+{"input":"Gracias por la información","expected":"¡Con gusto hermosa! 💖 Estamos aquí para ti en Beauty Blossoms 🌸","actual":"¡Con gusto hermosa! 💖 Estamos aquí para ti en Beauty Blossoms 🌸"}
+{"input":"Muchas gracias","expected":"¡Con gusto hermosa! 💖 Estamos aquí para ti en Beauty Blossoms 🌸","actual":"¡Con gusto hermosa! 💖 Estamos aquí para ti en Beauty Blossoms 🌸"}
+{"input":"Adiós","expected":"¡Con gusto hermosa! 💖 Estamos aquí para ti en Beauty Blossoms 🌸","actual":"¡Con gusto hermosa! 💖 Estamos aquí para ti en Beauty Blossoms 🌸"}
+{"input":"Chao","expected":"¡Con gusto hermosa! 💖 Estamos aquí para ti en Beauty Blossoms 🌸","actual":"¡Con gusto hermosa! 💖 Estamos aquí para ti en Beauty Blossoms 🌸"}
+{"input":"¿Qué servicios ofrecen?","expected":"¡Hola hermosa! 💖 ¿Te gustaría agendar unas uñas pestañas o cejas?","actual":"¡Hola hermosa! 💖 ¿Te gustaría agendar unas uñas pestañas o cejas?"}
+{"input":"¿Tienen servicio de pestañas?","expected":"¡Claro que sí! Las pestañas clásicas tienen un costo de $400 MXN 💅 ¿Te gustaría agendar una cita?","actual":"El precio de *pestañas clásicas* es de $400 MXN 💵"}
+{"input":"¿Hacen uñas?","expected":"¡Claro que sí! Las uñas acrílicas tienen un costo desde $250 MXN 💅 ¿Te gustaría agendar una cita?","actual":"El precio de *uñas acrílicas* es de Desde $250 MXN 💵"}
+{"input":"¿Tienen tratamientos faciales?","expected":"¡Claro que sí! El BBLips tiene un costo de $500 MXN 💅 ¿Te gustaría agendar una cita?","actual":"El precio de *bblips* es de $500 MXN 💵"}
+{"input":"¿Cuánto cuesta el BBLips?","expected":"El precio de *bblips* es de $500 MXN 💵","actual":"El precio de *bblips* es de $500 MXN 💵"}

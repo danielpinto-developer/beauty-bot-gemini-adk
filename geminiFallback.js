@@ -164,10 +164,13 @@ async function getGeminiReply(userText) {
       apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/${tunedEndpoint}:predict`;
       console.log("🔧 Mode: tuned endpoint");
       console.log("🔗 apiUrl:", apiUrl);
-      const auth = new GoogleAuth({ scopes: ["https://www.googleapis.com/auth/cloud-platform"] });
+      const auth = new GoogleAuth({
+        scopes: ["https://www.googleapis.com/auth/cloud-platform"],
+      });
       const client = await auth.getClient();
       const accessToken = await client.getAccessToken();
-      const token = typeof accessToken === "string" ? accessToken : accessToken.token;
+      const token =
+        typeof accessToken === "string" ? accessToken : accessToken.token;
       headers = { ...headers, Authorization: `Bearer ${token}` };
 
       requestBody = {
@@ -208,10 +211,17 @@ async function getGeminiReply(userText) {
     // RESPONSE HANDLING
     let rawText = "";
     if (hasTunedEndpoint) {
-      console.log("📄 Full raw response:", JSON.stringify(response.data, null, 2));
-      rawText = response.data?.predictions?.[0]?.content?.parts?.[0]?.text || "";
+      console.log(
+        "📄 Full raw response:",
+        JSON.stringify(response.data, null, 2)
+      );
+      rawText =
+        response.data?.predictions?.[0]?.content?.parts?.[0]?.text || "";
     } else {
-      console.log("📄 Full raw response:", JSON.stringify(response.data, null, 2));
+      console.log(
+        "📄 Full raw response:",
+        JSON.stringify(response.data, null, 2)
+      );
       rawText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
     }
     console.log("📝 Extracted text:", rawText);
@@ -243,7 +253,10 @@ async function getGeminiReply(userText) {
     console.error("❌ Gemini fallback error:", err.message || err);
     if (err.response) {
       console.error("📄 Response status:", err.response.status);
-      console.error("📄 Response data:", JSON.stringify(err.response.data, null, 2));
+      console.error(
+        "📄 Response data:",
+        JSON.stringify(err.response.data, null, 2)
+      );
     }
     return {
       intent: "fallback",
