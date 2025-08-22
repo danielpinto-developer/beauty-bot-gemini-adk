@@ -1,6 +1,7 @@
 const { sendMessage } = require("./whatsapp");
 const { getGeminiReply } = require("./geminiFallback");
 const { db, admin } = require("./firebase");
+const { generateIntentVariants } = require("./api_backend/lib/nlg");
 
 const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
 
@@ -170,22 +171,37 @@ async function messageDispatcher({ phone, text }) {
     slots,
   });
 
-  let replyText = response;
+  let replyText;
 
+  try {
+    // Generate NLG variants for all intents
+    const variants = await generateIntentVariants(intent, slots);
+    // Pick random variant
+    replyText = variants[Math.floor(Math.random() * variants.length)];
+    console.log("🎨 Selected variant:", replyText);
+  } catch (error) {
+    console.error("❌ NLG generation failed:", error.message);
+    // Fallback to original response from Gemini
+    replyText =
+      response ||
+      "Lo siento, no entendí muy bien eso 🤖 ¿Podrías decírmelo de otra forma?";
+  }
+
+  // Handle special cases that need dynamic content
   if (intent === "book_appointment") {
     const price = servicio ? precios[servicio.toLowerCase()] : null;
     const fechaFormatted = formatFecha(fecha);
 
-    if (fecha && hora && servicio) {
-      replyText = `Perfecto 💅 Cita para *${servicio}* el *${fechaFormatted}* a las *${hora}*${
-        price ? ` (costo: ${price})` : ""
-      }. En unos momentos confirmamos la disponibilidad de tu cita ✨`;
-    } else {
-      const missing = [];
-      if (!servicio) missing.push("servicio");
-      if (!fecha) missing.push("fecha");
-      if (!hora) missing.push("hora");
-      replyText = `Solo necesito ${missing.join(", ")} para agendar tu cita 💅`;
+    // If we have all required slots, append price if available
+    if (fecha && hora && servicio && price) {
+      // Replace any existing price reference or append if none exists
+      if (replyText.includes("costo:")) {
+        replyText = replyText.replace(/costo:\s*[^)]*\)?/, `costo: ${price})`);
+      } else if (replyText.includes(")")) {
+        replyText = replyText.replace(")", ` costo: ${price})`);
+      } else {
+        replyText = `${replyText} (costo: ${price})`;
+      }
     }
 
     await notifyMoni(
@@ -198,21 +214,18 @@ async function messageDispatcher({ phone, text }) {
 
   if (intent === "faq_price" && servicio) {
     const price = precios[servicio.toLowerCase()];
-    replyText = price
-      ? `El precio de *${servicio}* es de ${price} 💵`
-      : `Ese servicio tiene precios variables. ¿Te gustaría más información?`;
+    if (price) {
+      // Replace generic price response with specific price
+      replyText = replyText.replace(
+        /precio de \*[^}]+\*/i,
+        `precio de *${servicio}* es de ${price}`
+      );
+    }
   }
 
+  // Location intent should always return the map link
   if (intent === "faq_location") {
     replyText = `📍 Ubicación: Beauty Blossoms \n(https://maps.app.goo.gl/CtavKUYUV3zyvaLU6)`;
-  }
-
-  if (intent === "gratitude") {
-    replyText = `¡Con gusto hermosa! 💖 Estamos aquí para ti en Beauty Blossoms 🌸`;
-  }
-
-  if (intent === "greeting") {
-    replyText = `¡Hola hermosa! 💖 ¿Te gustaría agendar unas uñas, pestañas o cejas? Cuéntame qué necesitas y para qué día.`;
   }
 
   await logMessage({

@@ -7,10 +7,21 @@ if (!process.env.GEMINI_API_KEY) {
   throw new Error("Missing GEMINI_API_KEY");
 }
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-pro" });
+// Support for tuned models via environment variable
+const BASE_MODEL = process.env.GEMINI_BASE_MODEL || "models/gemini-1.5-pro";
+const TUNED_MODEL_NAME = process.env.TUNED_MODEL_NAME;
 
-console.log("✅ Gemini model initialized: gemini-1.5-pro");
+const modelName = TUNED_MODEL_NAME || BASE_MODEL;
+console.log(`🎯 Using Gemini model: ${modelName}`);
+console.log(`📊 Base model: ${BASE_MODEL}`);
+if (TUNED_MODEL_NAME) {
+  console.log(`🎵 Tuned model: ${TUNED_MODEL_NAME}`);
+}
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: modelName });
+
+console.log(`✅ Gemini model initialized: ${modelName}`);
 
 const validServicios = [
   // 💅 NAIL BAR

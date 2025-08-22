@@ -4,3 +4,8 @@ firebase-service-account.json
 
 *.log
 .DS_Store
+
+artifacts/*.jsonl
+training/*.csv
+beautybot_test_scenarios.txt
+test_results_gemini_bot.csv
