@@ -120,6 +120,16 @@ async function logMessage({
   if (action) data.action = action;
   if (slots) data.slots = slots;
 
+  if (typeof data.text === "undefined") {
+    console.warn("⚠️ Skipping Firestore write: data.text is undefined", {
+      phone,
+      sender,
+      direction,
+      intent,
+    });
+    return;
+  }
+
   await admin
     .firestore()
     .collection("chats")
@@ -190,9 +200,7 @@ async function messageDispatcher({ phone, text }) {
 
     await notifyMoni(
       phone,
-      `Cita solicitada: ${fechaFormatted || "?"} ${hora || "?"} (${
-        servicio || "?"
-      })`
+      `Cita solicitada: ${fechaFormatted || "?"} ${hora || "?"} (${servicio || "?"})`
     );
   }
 

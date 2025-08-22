@@ -8,5 +8,6 @@ if (!admin.apps.length) {
 }
 
 const db = getFirestore();
+db.settings({ ignoreUndefinedProperties: true });
 
 module.exports = { admin, db };
