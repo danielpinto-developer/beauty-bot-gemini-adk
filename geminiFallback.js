@@ -155,7 +155,10 @@ async function getGeminiReply(userText) {
     let requestBody;
 
     if (hasTunedName) {
-      apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/${process.env.TUNED_MODEL_NAME}:generateContent`;
+      apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/${process.env.TUNED_MODEL_NAME.replace(
+        /@.*/,
+        ""
+      )}:generateContent`;
       console.log("🔧 Mode: tuned model");
       console.log("🔗 apiUrl:", apiUrl);
 
