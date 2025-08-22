@@ -1,16 +1,29 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const axios = require("axios");
+const { GoogleAuth } = require("google-auth-library");
 
 console.log("📦 Loading Gemini module...");
 
-if (!process.env.GEMINI_API_KEY) {
-  console.error("❌ GEMINI_API_KEY is missing from .env");
-  throw new Error("Missing GEMINI_API_KEY");
+const hasTuned = !!process.env.TUNED_MODEL_NAME;
+
+if (hasTuned) {
+  if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    console.error("❌ GOOGLE_APPLICATION_CREDENTIALS is missing from env");
+    throw new Error("Missing GOOGLE_APPLICATION_CREDENTIALS");
+  }
+  console.log(`⚡ Using tuned model: ${process.env.TUNED_MODEL_NAME}`);
+} else if (process.env.GEMINI_API_KEY && process.env.GEMINI_BASE_MODEL) {
+  console.log(`⚡ Using base model: ${process.env.GEMINI_BASE_MODEL}`);
+} else {
+  throw new Error("No model configured");
 }
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-pro" });
+// Build modelName, stripping any '@version' suffix when using tuned model
+const rawName = process.env.TUNED_MODEL_NAME;
+const modelName = hasTuned
+  ? String(rawName || "").replace(/@.*/, "")
+  : `models/${process.env.GEMINI_BASE_MODEL}`;
 
-console.log("✅ Gemini model initialized: gemini-1.5-pro");
+console.log(`✅ Gemini model initialized: ${modelName}`);
 
 const validServicios = [
   // 💅 NAIL BAR
@@ -144,22 +157,51 @@ async function getGeminiReply(userText) {
   console.log("🧠 getGeminiReply called with input:", userText);
 
   try {
-    const chat = await model.startChat({
-      history: [
+    let apiUrl;
+    let headers = { "Content-Type": "application/json" };
+
+    if (hasTuned) {
+      apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/${modelName}:generateContent`;
+      const auth = new GoogleAuth({ scopes: ["https://www.googleapis.com/auth/cloud-platform"] });
+      const client = await auth.getClient();
+      const accessToken = await client.getAccessToken();
+      const token = typeof accessToken === "string" ? accessToken : accessToken.token;
+      headers = { ...headers, Authorization: `Bearer ${token}` };
+    } else {
+      if (!process.env.GEMINI_API_KEY) {
+        throw new Error("Missing GEMINI_API_KEY");
+      }
+      apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    }
+
+    const requestBody = {
+      contents: [
         {
-          role: "user",
-          parts: [{ text: systemPrompt }],
+          parts: [
+            {
+              text: systemPrompt,
+            },
+          ],
+        },
+        {
+          parts: [
+            {
+              text: userText,
+            },
+          ],
         },
       ],
-    });
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 1024,
+      },
+    };
 
-    console.log("💬 Chat session started successfully");
-    console.log("📨 Sending user message to Gemini:", userText);
-
-    const result = await chat.sendMessage(userText);
+    console.log("📨 Sending request to Gemini API");
+    const response = await axios.post(apiUrl, requestBody, { headers });
 
     console.log("✅ Gemini responded");
-    const raw = result.response.text().trim();
+    const raw = response.data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     console.log("📄 Raw Gemini response:\n", raw);
 
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
@@ -171,7 +213,6 @@ async function getGeminiReply(userText) {
     const parsed = JSON.parse(jsonText);
     console.log("✅ Parsed JSON response:", parsed);
 
-    // Validate servicio field only
     const cleanedServicio = validateServicioKey(parsed.slots?.servicio);
 
     return {
@@ -187,6 +228,13 @@ async function getGeminiReply(userText) {
     };
   } catch (err) {
     console.error("❌ Gemini fallback error:", err.message || err);
+    if (err.response) {
+      console.error("📄 Response status:", err.response.status);
+      console.error(
+        "📄 Response data:",
+        JSON.stringify(err.response.data, null, 2)
+      );
+    }
     return {
       intent: "fallback",
       slots: {
