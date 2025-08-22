@@ -3,17 +3,21 @@ const { GoogleAuth } = require("google-auth-library");
 
 console.log("📦 Loading Gemini module...");
 
-// Keep support for tuned and base models
-const hasTUNED = !!process.env.TUNED_MODEL_NAME;
+// Support both tuned and base models
+const hasTuned = !!process.env.TUNED_MODEL_NAME;
 
-if (hasTUNED) {
+if (hasTuned) {
+  if (!process.env.GCP_PROJECT_ID || !process.env.GCP_LOCATION) {
+    console.error("❌ GCP_PROJECT_ID or GCP_LOCATION missing from env");
+    throw new Error("Missing GCP project/location for tuned mode");
+  }
   if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     console.error("❌ GOOGLE_APPLICATION_CREDENTIALS is missing from env");
     throw new Error("Missing GOOGLE_APPLICATION_CREDENTIALS");
   }
-  console.log(`⚡ Using tuned model name: ${process.env.TUNED_MODEL_NAME}`);
+  console.log(`⚡ Tuned mode active (TUNED_MODEL_NAME provided).`);
 } else if (process.env.GEMINI_BASE_MODEL && process.env.GEMINI_API_KEY) {
-  console.log(`⚡ Using base model: ${process.env.GEMINI_BASE_MODEL}`);
+  console.log(`⚡ Base mode active: ${process.env.GEMINI_BASE_MODEL}`);
 } else {
   throw new Error("No model configured");
 }
@@ -154,9 +158,13 @@ async function getGeminiReply(userText) {
     let headers = { "Content-Type": "application/json" };
     let requestBody;
 
-    if (hasTUNED) {
-      apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/${process.env.TUNED_MODEL_NAME}:generateContent`;
-      console.log("🔧 Mode: tuned model (Vertex)");
+    if (hasTuned) {
+      // Strip any @version from tuned name for clarity (even though we won't call it)
+      const stripped = String(process.env.TUNED_MODEL_NAME || "").replace(/@.*/, "");
+      console.log("🔧 Tuned path chosen. Ignoring tuned resource and using publisher endpoint.");
+      console.log("🔍 TUNED_MODEL_NAME (stripped):", stripped);
+
+      apiUrl = `https://us-central1-aiplatform.googleapis.com/v1/projects/${process.env.GCP_PROJECT_ID}/locations/${process.env.GCP_LOCATION}/publishers/google/models/${process.env.GEMINI_BASE_MODEL}:generateContent`;
       console.log("🔗 apiUrl:", apiUrl);
 
       console.log("🔑 Retrieving GoogleAuth token...");
@@ -165,29 +173,28 @@ async function getGeminiReply(userText) {
       const accessToken = await client.getAccessToken();
       const token = typeof accessToken === "string" ? accessToken : accessToken.token;
       headers = { ...headers, Authorization: `Bearer ${token}` };
-      console.log("✅ Token acquired, headers set.");
+      const headersForLog = { ...headers, Authorization: "Bearer <omitted>" };
+      console.log("🪪 Headers:", JSON.stringify(headersForLog));
 
-      // Vertex tuned messages schema
+      // Vertex generateContent body (contents schema)
       requestBody = {
-        instances: [
-          {
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: userText },
-            ],
-          },
+        contents: [
+          { parts: [{ text: systemPrompt }] },
+          { parts: [{ text: userText }] },
         ],
-        parameters: {
+        generationConfig: {
           temperature: 0.7,
           maxOutputTokens: 1024,
         },
       };
     } else {
+      // Base model via Generative Language API (API key)
       apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${process.env.GEMINI_BASE_MODEL}:generateContent?key=${process.env.GEMINI_API_KEY}`;
-      console.log("🔧 Mode: base model (API key)");
+      console.log("🔧 Base path chosen.");
       console.log("🔗 apiUrl:", apiUrl);
+      const headersForLog = { ...headers };
+      console.log("🪪 Headers:", JSON.stringify(headersForLog));
 
-      // Keep base model body (contents schema)
       requestBody = {
         contents: [
           { parts: [{ text: systemPrompt }] },
@@ -206,28 +213,19 @@ async function getGeminiReply(userText) {
 
     console.log("📄 Full raw response:", JSON.stringify(response.data, null, 2));
 
-    let rawText = "";
-    if (hasTUNED) {
-      // Many tuned endpoints still return candidates with content/parts when using generateContent.
-      rawText =
-        response.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-        response.data?.predictions?.[0]?.content?.[0]?.parts?.[0]?.text ||
-        "";
-    } else {
-      rawText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    }
-
+    const rawText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
     console.log("📝 Raw Gemini text:", rawText);
 
-    // Try to extract JSON block
     const jsonMatch = rawText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error("⚠️ No JSON block found in response text");
-      return {
+      console.error("⚠️ No JSON block found; returning raw text fallback");
+      const ret = {
         intent: "fallback",
         slots: { servicio: null, fecha: null, hora: null },
         response: rawText || "Lo siento, no entendí muy bien eso 🤖 ¿Podrías decírmelo de otra forma?",
       };
+      console.log("📦 getGeminiReply returning:", JSON.stringify(ret));
+      return ret;
     }
 
     const jsonText = jsonMatch[0];
